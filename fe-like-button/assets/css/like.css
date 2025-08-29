@@ -1,0 +1,5 @@
+.fe-like-wrap{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem}
+.fe-like-btn{border:1px solid #e2e8f0;border-radius:9999px;padding:.35rem .75rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+.fe-like-wrap.fe-liked .fe-like-btn{opacity:.85}
+.fe-like-count{font-weight:600}
+.fe-like-feedback{margin-left:.5rem;font-size:.9em}
