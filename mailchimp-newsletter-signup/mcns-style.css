@@ -1,0 +1,6 @@
+.mcns-form { max-width: 420px; margin: 0; }
+.mcns-form input[type="text"],
+.mcns-form input[type="email"] { width: 100%; padding: 8px; box-sizing: border-box; margin-top: 4px; }
+.mcns-form button { padding: 8px 14px; border: none; cursor: pointer; border-radius: 4px; }
+.mcns-success { color: #155724; background: #d4edda; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
+.mcns-error { color: #721c24; background: #f8d7da; padding: 8px; border-radius: 4px; margin-bottom: 10px; }
