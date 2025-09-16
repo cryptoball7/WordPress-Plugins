@@ -1,0 +1,22 @@
+/* Basic styling for the activity stream */
+.ase-activity-stream { max-width: 800px; margin: 0 auto; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+.ase-activity { border: 1px solid #e6e6e6; padding: 16px; border-radius: 8px; margin-bottom: 12px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+.ase-activity-title { margin: 0 0 6px 0; font-size: 1.1rem; }
+.ase-activity-meta { color: #666; font-size: 0.85rem; margin-bottom: 8px; }
+.ase-activity-content { margin: 8px 0 12px 0; color: #222; line-height: 1.45; }
+
+.ase-activity-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ase-reactions { display: flex; gap: 8px; align-items: center; }
+.ase-reaction-btn { border: 1px solid #e6e6e6; background: #fafafa; padding: 6px 8px; border-radius: 6px; cursor: pointer; display:flex; align-items:center; gap:6px; transition: transform .06s ease, background .12s ease; }
+.ase-reaction-btn:hover { transform: translateY(-2px); }
+.ase-reaction-btn.ase-reacted { background: #e8f5ff; border-color: #c8e8ff; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+
+.ase-emoji { font-size: 1.1rem; line-height: 1; }
+.ase-count { font-weight: 600; font-size: 0.95rem; margin-left: 4px; }
+
+.ase-tooltip { display: none; position: absolute; background: rgba(0,0,0,0.85); color: #fff; padding: 6px 8px; border-radius: 6px; font-size: 0.85rem; transform: translateY(-4px); }
+
+.ase-no-activities { color: #777; text-align: center; padding: 18px; }
+
+/* Admin column small style */
+.ase-admin-reaction { margin-bottom: 6px; font-size: 13px; }
