@@ -1,0 +1,36 @@
+.ai-shopping-assistant-widget {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    font-family: Arial, sans-serif;
+    z-index: 99999;
+}
+.asa-toggle {
+    background: #0073aa;
+    color: #fff;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+.asa-panel {
+    width: 320px;
+    max-height: 520px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.2);
+    overflow: hidden;
+    margin-top: 10px;
+}
+.asa-header { padding: 12px; border-bottom: 1px solid #eee; font-weight: 600; }
+.asa-messages { padding: 12px; flex: 1 1 auto; overflow-y: auto; background: #fafafa; }
+.asa-form { display: flex; border-top: 1px solid #eee; padding: 8px; }
+.asa-form input { flex: 1 1 auto; padding: 8px; border-radius: 4px; border: 1px solid #ddd; margin-right: 8px; }
+.asa-form button { padding: 8px 12px; border-radius: 4px; background: #0073aa; color: #fff; border: none; }
+.asa-message { margin-bottom: 10px; }
+.asa-user .asa-text { background: #0073aa; color: #fff; padding: 8px; border-radius: 6px; display:inline-block; max-width: 100%; }
+.asa-assistant .asa-text { background: #fff; color: #222; padding: 8px; border-radius: 6px; border: 1px solid #eee; display:inline-block; max-width: 100%; }
+.asa-meta { font-size: 11px; color: #666; margin-top: 6px; }
