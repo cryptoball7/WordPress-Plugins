@@ -1,0 +1,18 @@
+.micro-donation-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.micro-donation-btn {
+    background: #ff5f5f;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.micro-donation-btn:hover {
+    background: #ff3030;
+}
