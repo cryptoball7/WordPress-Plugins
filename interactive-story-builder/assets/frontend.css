@@ -1,0 +1,8 @@
+
+.isb-story { width:100%; }
+.isb-section { min-height:60vh; display:flex; align-items:center; }
+.isb-section-inner { margin: 0 auto; width: 90%; max-width: 900px; padding: 40px 20px; transition: transform .4s ease, opacity .4s ease; }
+.isb-section-title { margin-top:0; }
+.isb-section.isb-active .isb-section-inner { transform: translateY(-6px); opacity:1; }
+.isb-section .isb-section-inner { opacity:0.9; }
+.isb-section .isb-section-inner.isb-pinned { position: fixed; top: 80px; left:50%; transform: translateX(-50%); width: 80%; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
