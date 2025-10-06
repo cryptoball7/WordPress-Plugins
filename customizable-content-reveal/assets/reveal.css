@@ -1,0 +1,35 @@
+.ccr-container {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin: 1rem 0;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.ccr-lock {
+  text-align: center;
+}
+
+.ccr-unlock-btn,
+.ccr-share-btn,
+.ccr-subscribe-btn {
+  padding: 0.6rem 1.2rem;
+  background: #0073aa;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ccr-unlock-btn:hover,
+.ccr-share-btn:hover,
+.ccr-subscribe-btn:hover {
+  background: #005b8a;
+}
+
+.ccr-email {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-right: 0.5rem;
+}
