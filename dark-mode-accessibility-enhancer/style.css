@@ -1,0 +1,39 @@
+#accessibility-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 9999;
+}
+
+#accessibility-controls button {
+    background: #ffffffcc;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#accessibility-controls button:hover {
+    background: #eee;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: #111 !important;
+    color: #f1f1f1 !important;
+}
+
+/* Large Font */
+body.large-font {
+    font-size: 1.25em;
+}
+
+/* Dyslexia-friendly Font */
+body.dyslexia-font {
+    font-family: 'OpenDyslexic', 'Comic Sans MS', Arial, sans-serif !important;
+}
