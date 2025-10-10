@@ -1,0 +1,22 @@
+#hs-tools {
+  display:flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+#hs-visual-container {
+  margin-top: 12px;
+}
+#hs-side-panel {
+  margin-bottom: 16px;
+}
+.hs-btn {
+  background:#0073aa;
+  color:#fff;
+  border:none;
+  padding:8px 12px;
+  border-radius:4px;
+  cursor:pointer;
+}
+.hs-btn:disabled { opacity:.6; cursor: not-allowed; }
+#hs-target-url { width: 380px; padding:6px 8px; border:1px solid #ccc; }
