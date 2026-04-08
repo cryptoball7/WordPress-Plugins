@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Custom REST CPT Endpoint
  * Description: Adds a custom post type and REST endpoint with root + fallback logic.
- * Version: 1.0
+ * Version: 1.1
  * Author: Cryptoball cryptoball7@gmail.com
  */
 
@@ -23,6 +23,63 @@ function crce_register_cpt() {
 add_action( 'init', 'crce_register_cpt' );
 
 /**
+ * Create default posts if they don't exist
+ */
+function crce_ensure_default_posts() {
+
+    $defaults = array(
+        'root' => array(
+            'title' => 'Root Endpoint',
+            'content' => '
+                <h2>Welcome to the API</h2>
+                <p>This is the default "root" response.</p>
+                <p>Use the endpoint with a slug to retrieve specific content:</p>
+                <pre>/wp-json/crce/v1/item/{slug}</pre>
+                <p>Create new Items in WordPress with matching slugs to expand this API.</p>
+            '
+        ),
+        'not-found' => array(
+            'title' => 'Content Not Found',
+            'content' => '
+                <h2>Not Found</h2>
+                <p>The requested resource could not be found.</p>
+                <p>Check the slug or create a new Item in the admin.</p>
+            '
+        )
+    );
+
+    foreach ( $defaults as $slug => $data ) {
+
+        $existing = get_page_by_path( $slug, OBJECT, 'crce_item' );
+
+        if ( ! $existing ) {
+            wp_insert_post( array(
+                'post_title'   => $data['title'],
+                'post_name'    => $slug,
+                'post_content' => $data['content'],
+                'post_status'  => 'publish',
+                'post_type'    => 'crce_item',
+            ));
+        }
+    }
+}
+
+/**
+ * Run on activation
+ */
+function crce_activate_plugin() {
+    crce_register_cpt();
+    flush_rewrite_rules();
+    crce_ensure_default_posts();
+}
+register_activation_hook( __FILE__, 'crce_activate_plugin' );
+
+/**
+ * Also ensure posts exist during runtime (safety net)
+ */
+add_action( 'init', 'crce_ensure_default_posts' );
+
+/**
  * Register REST Route
  */
 function crce_register_rest_route() {
@@ -41,14 +98,8 @@ function crce_get_item( $request ) {
 
     $slug = $request->get_param( 'slug' );
 
-    // Determine target slug
-    if ( empty( $slug ) ) {
-        $target_slug = 'root';
-    } else {
-        $target_slug = sanitize_title( $slug );
-    }
+    $target_slug = empty( $slug ) ? 'root' : sanitize_title( $slug );
 
-    // Query for the requested post
     $query = new WP_Query( array(
         'post_type' => 'crce_item',
         'name'      => $target_slug,
@@ -60,7 +111,7 @@ function crce_get_item( $request ) {
         return crce_format_post( get_post() );
     }
 
-    // Fallback to "not-found" post
+    // fallback
     $fallback = new WP_Query( array(
         'post_type' => 'crce_item',
         'name'      => 'not-found',
@@ -72,7 +123,6 @@ function crce_get_item( $request ) {
         return crce_format_post( get_post() );
     }
 
-    // Absolute fallback (if even not-found doesn't exist)
     return new WP_REST_Response( array(
         'error' => 'No content found.',
     ), 404 );
