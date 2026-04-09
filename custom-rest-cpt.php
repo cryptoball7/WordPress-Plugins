@@ -132,10 +132,19 @@ function crce_get_item( $request ) {
  * Format Post for API Output
  */
 function crce_format_post( $post ) {
+
+    $raw_content = $post->post_content;
+
+    // Split into paragraphs
+    $paragraphs = array_filter( array_map( function( $p ) {
+        return trim( wp_strip_all_tags( $p ) );
+    }, preg_split( '/\n\s*\n/', $raw_content ) ) );
+
     return array(
-        'id'      => $post->ID,
-        'slug'    => $post->post_name,
-        'title'   => get_the_title( $post ),
-        'content' => apply_filters( 'the_content', $post->post_content ),
+        'id'         => $post->ID,
+        'slug'       => $post->post_name,
+        'title'      => html_entity_decode( get_the_title( $post ), ENT_QUOTES, 'UTF-8' ),
+        'content'    => implode( "\n\n", $paragraphs ),
+        'paragraphs' => array_values( $paragraphs ),
     );
 }
