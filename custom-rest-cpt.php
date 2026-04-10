@@ -187,7 +187,7 @@ function crce_register_settings() {
 }
 add_action( 'admin_init', 'crce_register_settings' );
 
-Add a field to General Settings
+// Add a field to General Settings
 
 function crce_add_settings_field() {
     add_settings_field(
