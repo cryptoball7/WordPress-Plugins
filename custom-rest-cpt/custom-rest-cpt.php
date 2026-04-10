@@ -148,3 +148,59 @@ function crce_format_post( $post ) {
         'paragraphs' => array_values( $paragraphs ),
     );
 }
+
+/**
+ * Output API notice in HTML source
+ */
+function crce_output_api_notice() {
+
+    if ( is_admin() ) return;
+
+    $base_url = get_rest_url( null, 'crce/v1/item' );
+
+    // Use the custom message (fallback to default)
+
+    $custom_message = get_option( 'crce_api_notice_message', '' );
+
+    if ( empty( $custom_message ) ) {
+        $message = "Custom REST API Available\n";
+        $message .= "Root endpoint: {$base_url}\n\n";
+        $message .= "Usage:\n";
+        $message .= "- GET {$base_url}\n";
+        $message .= "- GET {$base_url}/{slug}\n";
+    } else {
+        $message = $custom_message;
+    }
+
+    echo "\n<!--\n" . esc_html( $message ) . "\n-->\n";
+}
+add_action( 'wp_head', 'crce_output_api_notice' );
+
+// Register a setting
+
+function crce_register_settings() {
+    register_setting( 'general', 'crce_api_notice_message', array(
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_textarea_field',
+        'default' => ''
+    ));
+}
+add_action( 'admin_init', 'crce_register_settings' );
+
+Add a field to General Settings
+
+function crce_add_settings_field() {
+    add_settings_field(
+        'crce_api_notice_message',
+        'API Source Notice',
+        'crce_settings_field_html',
+        'general'
+    );
+}
+add_action( 'admin_init', 'crce_add_settings_field' );
+
+function crce_settings_field_html() {
+    $value = get_option( 'crce_api_notice_message', '' );
+    echo '<textarea name="crce_api_notice_message" rows="5" cols="50" class="large-text code">' . esc_textarea( $value ) . '</textarea>';
+    echo '<p class="description">Message shown in page source (HTML comment).</p>';
+}
