@@ -16,7 +16,7 @@ function crce_register_cpt() {
         'label' => 'Items',
         'public' => true,
         'show_in_rest' => true,
-        'supports' => array( 'title', 'editor', 'custom-fields' ),
+        'supports' => array( 'title', 'editor', 'custom-fields', 'comments' ),
         'has_archive' => true,
     ));
 }
@@ -162,12 +162,31 @@ function crce_output_api_notice() {
 
     $custom_message = get_option( 'crce_api_notice_message', '' );
 
-    if ( empty( $custom_message ) ) {
-        $message = "Custom REST API Available\n";
-        $message .= "Root endpoint: {$base_url}\n\n";
-        $message .= "Usage:\n";
-        $message .= "- GET {$base_url}\n";
-        $message .= "- GET {$base_url}/{slug}\n";
+    if ( empty( $custom_msg ) ) {
+
+        $message  = "Custom REST API Available\n";
+        $message .= "================================\n\n";
+
+        $message .= "GET Endpoints:\n";
+        $message .= "Root: {$base_url}\n";
+        $message .= "By slug: {$base_url}/{slug}\n\n";
+
+        $message .= "POST Endpoint (Reply):\n";
+        $message .= "{$base_url}/{slug}/reply\n\n";
+
+        $message .= "Request Body (JSON):\n";
+        $message .= "{\n";
+        $message .= "  \"author_name\": \"Your Name\",\n";
+        $message .= "  \"author_email\": \"your@email.com\",\n";
+        $message .= "  \"content\": \"Your reply message\"\n";
+        $message .= "}\n\n";
+
+        $message .= "Notes:\n";
+        $message .= "- Replies are stored as comments on the item\n";
+        $message .= "- Content must not be empty\n";
+        $message .= "- Slug must match an existing item\n";
+        $message .= "- If no slug is provided, the root item is returned\n";
+
     } else {
         $message = $custom_message;
     }
@@ -203,4 +222,63 @@ function crce_settings_field_html() {
     $value = get_option( 'crce_api_notice_message', '' );
     echo '<textarea name="crce_api_notice_message" rows="5" cols="50" class="large-text code">' . esc_textarea( $value ) . '</textarea>';
     echo '<p class="description">Message shown in page source (HTML comment).</p>';
+}
+
+// Handling Replies
+
+function crce_register_reply_route() {
+    register_rest_route( 'crce/v1', '/item/(?P<slug>[a-zA-Z0-9-_]+)/reply', array(
+        'methods'  => 'POST',
+        'callback' => 'crce_handle_reply',
+        'permission_callback' => '__return_true',
+    ));
+}
+add_action( 'rest_api_init', 'crce_register_reply_route' );
+
+function crce_handle_reply( $request ) {
+
+    $slug = sanitize_title( $request['slug'] );
+
+    // Find post
+    $post = get_page_by_path( $slug, OBJECT, 'crce_item' );
+
+    if ( ! $post ) {
+        return new WP_REST_Response( array(
+            'error' => 'Post not found'
+        ), 404 );
+    }
+
+    // Get JSON body
+    $params = $request->get_json_params();
+
+    $author_name  = sanitize_text_field( $params['author_name'] ?? '' );
+    $author_email = sanitize_email( $params['author_email'] ?? '' );
+    $content      = sanitize_textarea_field( $params['content'] ?? '' );
+
+    if ( empty( $content ) ) {
+        return new WP_REST_Response( array(
+            'error' => 'Reply content is required'
+        ), 400 );
+    }
+
+    // Insert comment
+    $comment_id = wp_insert_comment( array(
+        'comment_post_ID' => $post->ID,
+        'comment_content' => $content,
+        'comment_author'  => $author_name,
+        'comment_author_email' => $author_email,
+        'comment_approved' => 1, // change to 0 if you want moderation
+    ));
+
+    if ( ! $comment_id ) {
+        return new WP_REST_Response( array(
+            'error' => 'Failed to save reply'
+        ), 500 );
+    }
+
+    return array(
+        'success' => true,
+        'comment_id' => $comment_id,
+        'post_slug' => $slug
+    );
 }
