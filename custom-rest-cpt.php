@@ -71,6 +71,10 @@ function crce_activate_plugin() {
     crce_register_cpt();
     flush_rewrite_rules();
     crce_ensure_default_posts();
+
+    if ( get_option( 'crce_api_notice_message', null ) === null ) {
+        add_option( 'crce_api_notice_message', crce_get_default_notice_message() );
+    }
 }
 register_activation_hook( __FILE__, 'crce_activate_plugin' );
 
@@ -152,43 +156,45 @@ function crce_format_post( $post ) {
 /**
  * Output API notice in HTML source
  */
+function crce_get_default_notice_message() {
+
+    $base_url = get_rest_url( null, 'crce/v1/item' );
+
+    $message  = "Custom REST API Available\n";
+    $message .= "================================\n\n";
+
+    $message .= "GET Endpoints:\n";
+    $message .= "Root: {$base_url}\n";
+    $message .= "By slug: {$base_url}/{slug}\n\n";
+
+    $message .= "POST Endpoint (Reply):\n";
+    $message .= "{$base_url}/{slug}/reply\n\n";
+
+    $message .= "Request Body (JSON):\n";
+    $message .= "{\n";
+    $message .= "  \"author_name\": \"Your Name\",\n";
+    $message .= "  \"author_email\": \"your@email.com\",\n";
+    $message .= "  \"content\": \"Your reply message\"\n";
+    $message .= "}\n\n";
+
+    $message .= "Notes:\n";
+    $message .= "- Replies are stored as comments on the item\n";
+    $message .= "- Content must not be empty\n";
+    $message .= "- Slug must match an existing item\n";
+    $message .= "- If no slug is provided, the root item is returned\n";
+
+    return $message;
+}
+
 function crce_output_api_notice() {
 
     if ( is_admin() ) return;
 
-    $base_url = get_rest_url( null, 'crce/v1/item' );
+    $message = get_option( 'crce_api_notice_message', '' );
 
-    // Use the custom message (fallback to default)
-
-    $custom_message = get_option( 'crce_api_notice_message', '' );
-
-    if ( empty( $custom_msg ) ) {
-
-        $message  = "Custom REST API Available\n";
-        $message .= "================================\n\n";
-
-        $message .= "GET Endpoints:\n";
-        $message .= "Root: {$base_url}\n";
-        $message .= "By slug: {$base_url}/{slug}\n\n";
-
-        $message .= "POST Endpoint (Reply):\n";
-        $message .= "{$base_url}/{slug}/reply\n\n";
-
-        $message .= "Request Body (JSON):\n";
-        $message .= "{\n";
-        $message .= "  \"author_name\": \"Your Name\",\n";
-        $message .= "  \"author_email\": \"your@email.com\",\n";
-        $message .= "  \"content\": \"Your reply message\"\n";
-        $message .= "}\n\n";
-
-        $message .= "Notes:\n";
-        $message .= "- Replies are stored as comments on the item\n";
-        $message .= "- Content must not be empty\n";
-        $message .= "- Slug must match an existing item\n";
-        $message .= "- If no slug is provided, the root item is returned\n";
-
-    } else {
-        $message = $custom_message;
+    // Safety fallback (in case option was deleted)
+    if ( empty( $message ) ) {
+        $message = crce_get_default_notice_message();
     }
 
     echo "\n<!--\n" . esc_html( $message ) . "\n-->\n";
@@ -219,8 +225,10 @@ function crce_add_settings_field() {
 add_action( 'admin_init', 'crce_add_settings_field' );
 
 function crce_settings_field_html() {
-    $value = get_option( 'crce_api_notice_message', '' );
-    echo '<textarea name="crce_api_notice_message" rows="5" cols="50" class="large-text code">' . esc_textarea( $value ) . '</textarea>';
+    $value = get_option( 'crce_api_notice_message', crce_get_default_notice_message() );
+    echo '<textarea name="crce_api_notice_message" rows="10" class="large-text code">'
+        . esc_textarea( $value ) .
+        '</textarea>';
     echo '<p class="description">Message shown in page source (HTML comment).</p>';
 }
 
