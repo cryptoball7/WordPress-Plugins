@@ -201,37 +201,6 @@ function crce_output_api_notice() {
 }
 add_action( 'wp_head', 'crce_output_api_notice' );
 
-// Register a setting
-
-function crce_register_settings() {
-    register_setting( 'general', 'crce_api_notice_message', array(
-        'type' => 'string',
-        'sanitize_callback' => 'sanitize_textarea_field',
-        'default' => ''
-    ));
-}
-add_action( 'admin_init', 'crce_register_settings' );
-
-// Add a field to General Settings
-
-function crce_add_settings_field() {
-    add_settings_field(
-        'crce_api_notice_message',
-        'API Source Notice',
-        'crce_settings_field_html',
-        'general'
-    );
-}
-add_action( 'admin_init', 'crce_add_settings_field' );
-
-function crce_settings_field_html() {
-    $value = get_option( 'crce_api_notice_message', crce_get_default_notice_message() );
-    echo '<textarea name="crce_api_notice_message" rows="10" class="large-text code">'
-        . esc_textarea( $value ) .
-        '</textarea>';
-    echo '<p class="description">Message shown in page source (HTML comment).</p>';
-}
-
 // Handling Replies
 
 function crce_register_reply_route() {
@@ -290,3 +259,120 @@ function crce_handle_reply( $request ) {
         'post_slug' => $slug
     );
 }
+
+// Settings Page
+
+function crce_add_admin_menu() {
+    add_menu_page(
+        'CRCE API Settings',        // Page title
+        'CRCE API',                // Menu title
+        'manage_options',          // Capability
+        'crce-settings',           // Menu slug
+        'crce_settings_page_html', // Callback
+        'dashicons-rest-api',      // Icon
+        25                         // Position
+    );
+}
+add_action( 'admin_menu', 'crce_add_admin_menu' );
+
+function crce_register_settings() {
+    register_setting(
+        'crce_settings_group',
+        'crce_api_notice_message',
+        array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_textarea_field',
+            'default' => ''
+        )
+    );
+}
+add_action( 'admin_init', 'crce_register_settings' );
+
+function crce_settings_page_html() {
+
+    if ( ! current_user_can( 'manage_options' ) ) return;
+
+    ?>
+    <div class="wrap">
+        <h1>CRCE API Settings</h1>
+
+        <form method="post" action="options.php">
+            <?php
+                settings_fields( 'crce_settings_group' );
+                do_settings_sections( 'crce_settings_group' );
+            ?>
+
+            <table class="form-table">
+                <tr>
+                    <th scope="row">API Source Notice</th>
+                    <td>
+                        <textarea 
+                            name="crce_api_notice_message" 
+                            rows="12" 
+                            class="large-text code"
+                        ><?php echo esc_textarea(
+                            get_option(
+                                'crce_api_notice_message',
+                                crce_get_default_notice_message()
+                            )
+                        ); ?></textarea>
+
+                        <p class="description">
+                            This message is shown in the HTML source of your site.
+                        </p>
+
+                        <button type="button" class="button" onclick="crceResetNotice()">
+                            Reset to Default
+                        </button>
+
+                        <script>
+                        function crceResetNotice() {
+                            if (confirm('Reset message to default?')) {
+                                document.querySelector('textarea[name="crce_api_notice_message"]').value = <?php echo json_encode( crce_get_default_notice_message() ); ?>;
+                            }
+                        }
+                        </script>
+
+                    </td>
+                </tr>
+            </table>
+
+            <?php submit_button(); ?>
+        </form>
+    </div>
+    <?php
+}
+
+/*
+TODO: make sure it works without this, then remove this whole block commented section
+// Register a setting
+
+function crce_register_settings() {
+    register_setting( 'general', 'crce_api_notice_message', array(
+        'type' => 'string',
+        'sanitize_callback' => 'sanitize_textarea_field',
+        'default' => ''
+    ));
+}
+add_action( 'admin_init', 'crce_register_settings' );
+
+// Add a field to General Settings
+
+function crce_add_settings_field() {
+    add_settings_field(
+        'crce_api_notice_message',
+        'API Source Notice',
+        'crce_settings_field_html',
+        'general'
+    );
+}
+add_action( 'admin_init', 'crce_add_settings_field' );
+
+function crce_settings_field_html() {
+    $value = get_option( 'crce_api_notice_message', crce_get_default_notice_message() );
+    echo '<textarea name="crce_api_notice_message" rows="10" class="large-text code">'
+        . esc_textarea( $value ) .
+        '</textarea>';
+    echo '<p class="description">Message shown in page source (HTML comment).</p>';
+}
+*/
