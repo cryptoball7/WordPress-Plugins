@@ -8,104 +8,124 @@
 
 if (!defined('ABSPATH')) exit;
 
-class Simple_Service_Marketplace {
+class Pro_Service_Marketplace {
 
     public function __construct() {
         add_action('init', [$this, 'register_post_types']);
-        add_shortcode('service_list', [$this, 'service_list_shortcode']);
-        add_shortcode('service_order_form', [$this, 'order_form_shortcode']);
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
-        add_action('admin_post_submit_order', [$this, 'handle_order']);
-        add_action('admin_post_nopriv_submit_order', [$this, 'handle_order']);
+        add_action('init', [$this, 'register_order_status']);
+        add_shortcode('psm_services', [$this, 'services_shortcode']);
+        add_shortcode('psm_dashboard', [$this, 'dashboard_shortcode']);
+        add_action('wp_enqueue_scripts', [$this, 'assets']);
+        add_action('admin_post_psm_order', [$this, 'handle_order']);
+        add_action('admin_post_nopriv_psm_order', [$this, 'handle_order']);
     }
 
-    public function enqueue_assets() {
-        wp_enqueue_style('ssm-style', plugin_dir_url(__FILE__) . 'style.css');
+    public function assets() {
+        wp_enqueue_style('psm-style', plugin_dir_url(__FILE__) . 'style.css');
     }
 
     public function register_post_types() {
-        register_post_type('service', [
-            'labels' => ['name' => 'Services'],
+        register_post_type('psm_service', [
+            'label' => 'Services',
             'public' => true,
-            'has_archive' => true,
-            'supports' => ['title', 'editor', 'thumbnail'],
+            'supports' => ['title','editor','thumbnail','author'],
         ]);
 
-        register_post_type('order', [
-            'labels' => ['name' => 'Orders'],
+        register_post_type('psm_order', [
+            'label' => 'Orders',
             'public' => false,
             'show_ui' => true,
-            'supports' => ['title'],
+            'supports' => ['title','author'],
         ]);
     }
 
-    public function service_list_shortcode() {
-        $services = get_posts(['post_type' => 'service']);
-        $output = '<div class="services">';
-
-        foreach ($services as $service) {
-            $output .= '<div class="service">';
-            $output .= '<h3>' . esc_html($service->post_title) . '</h3>';
-            $output .= '<p>' . esc_html(wp_trim_words($service->post_content, 20)) . '</p>';
-            $output .= '<a href="?order_service=' . $service->ID . '">Order</a>';
-            $output .= '</div>';
-        }
-
-        $output .= '</div>';
-        return $output;
+    public function register_order_status() {
+        register_post_status('pending', ['label' => 'Pending','public' => true]);
+        register_post_status('in_progress', ['label' => 'In Progress','public' => true]);
+        register_post_status('completed', ['label' => 'Completed','public' => true]);
     }
 
-    public function order_form_shortcode() {
-        if (!isset($_GET['order_service'])) return '';
-
-        $service_id = intval($_GET['order_service']);
-        $service = get_post($service_id);
-
-        if (!$service) return '';
-
+    public function services_shortcode() {
+        $q = new WP_Query(['post_type'=>'psm_service']);
         ob_start();
-        ?>
-        <h2>Order: <?php echo esc_html($service->post_title); ?></h2>
-        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
-            <input type="hidden" name="action" value="submit_order">
-            <input type="hidden" name="service_id" value="<?php echo $service_id; ?>">
 
-            <label>Your Name</label>
-            <input type="text" name="name" required>
+        echo '<div class="psm-grid">';
+        while($q->have_posts()): $q->the_post();
+            $price = get_post_meta(get_the_ID(),'price',true);
+            ?>
+            <div class="psm-card">
+                <h3><?php the_title(); ?></h3>
+                <p><?php echo wp_trim_words(get_the_content(),15); ?></p>
+                <strong>$<?php echo esc_html($price); ?></strong>
+                <a href="?psm_order=<?php the_ID(); ?>">Order</a>
+            </div>
+            <?php
+        endwhile;
+        echo '</div>';
 
-            <label>Your Email</label>
-            <input type="email" name="email" required>
+        if(isset($_GET['psm_order'])) {
+            echo $this->order_form(intval($_GET['psm_order']));
+        }
 
-            <label>Details</label>
-            <textarea name="details" required></textarea>
-
-            <button type="submit">Place Order</button>
-        </form>
-        <?php
         return ob_get_clean();
     }
 
+    private function order_form($service_id) {
+        if(!is_user_logged_in()) return '<p>Please login to order.</p>';
+
+        ob_start(); ?>
+        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+            <input type="hidden" name="action" value="psm_order">
+            <input type="hidden" name="service_id" value="<?php echo $service_id; ?>">
+
+            <textarea name="details" placeholder="Describe your requirements" required></textarea>
+            <button type="submit">Place Order</button>
+        </form>
+        <?php return ob_get_clean();
+    }
+
     public function handle_order() {
-        $name = sanitize_text_field($_POST['name']);
-        $email = sanitize_email($_POST['email']);
-        $details = sanitize_textarea_field($_POST['details']);
+        if(!is_user_logged_in()) wp_die('Login required');
+
+        $user_id = get_current_user_id();
         $service_id = intval($_POST['service_id']);
+        $details = sanitize_textarea_field($_POST['details']);
 
         $order_id = wp_insert_post([
-            'post_type' => 'order',
-            'post_title' => 'Order from ' . $name,
-            'post_status' => 'publish'
+            'post_type'=>'psm_order',
+            'post_status'=>'pending',
+            'post_author'=>$user_id,
+            'post_title'=>'Order #'.time()
         ]);
 
-        if ($order_id) {
-            update_post_meta($order_id, 'email', $email);
-            update_post_meta($order_id, 'details', $details);
-            update_post_meta($order_id, 'service_id', $service_id);
+        update_post_meta($order_id,'service_id',$service_id);
+        update_post_meta($order_id,'details',$details);
+
+        wp_redirect(home_url('/dashboard'));
+        exit;
+    }
+
+    public function dashboard_shortcode() {
+        if(!is_user_logged_in()) return '<p>Please login.</p>';
+
+        $orders = get_posts([
+            'post_type'=>'psm_order',
+            'author'=>get_current_user_id()
+        ]);
+
+        ob_start();
+        echo '<h2>My Orders</h2>';
+
+        foreach($orders as $order) {
+            $status = get_post_status($order->ID);
+            echo '<div class="psm-order">';
+            echo '<strong>'.$order->post_title.'</strong>';
+            echo '<p>Status: '.$status.'</p>';
+            echo '</div>';
         }
 
-        wp_redirect(home_url('/thank-you'));
-        exit;
+        return ob_get_clean();
     }
 }
 
-new Simple_Service_Marketplace();
+new Pro_Service_Marketplace();
