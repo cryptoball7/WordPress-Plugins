@@ -7,9 +7,6 @@
  */
 
 if (!defined('ABSPATH')) exit;
-
-// ⚠️ Install Stripe via Composer in plugin folder:
-// composer require stripe/stripe-php
 require_once __DIR__ . '/vendor/autoload.php';
 
 class Pro_Service_Marketplace {
@@ -21,6 +18,9 @@ class Pro_Service_Marketplace {
         add_action('init', [$this, 'register_post_types']);
         add_shortcode('psm_services', [$this, 'services_shortcode']);
         add_shortcode('psm_dashboard', [$this, 'dashboard_shortcode']);
+
+        add_action('admin_post_psm_send_message', [$this, 'send_message']);
+        add_action('admin_post_nopriv_psm_send_message', [$this, 'send_message']);
 
         add_action('rest_api_init', function () {
             register_rest_route('psm/v1', '/stripe-webhook', [
@@ -44,13 +44,19 @@ class Pro_Service_Marketplace {
             'show_ui' => true,
             'supports' => ['title','author'],
         ]);
+
+        register_post_type('psm_message', [
+            'label' => 'Messages',
+            'public' => false,
+            'show_ui' => false,
+            'supports' => ['editor','author'],
+        ]);
     }
 
     public function services_shortcode() {
         $q = new WP_Query(['post_type'=>'psm_service']);
         ob_start();
 
-        echo '<div>';
         while($q->have_posts()): $q->the_post();
             $price = get_post_meta(get_the_ID(),'price',true);
             ?>
@@ -66,7 +72,6 @@ class Pro_Service_Marketplace {
             </div>
             <?php
         endwhile;
-        echo '</div>';
 
         if(isset($_POST['psm_checkout'])) {
             return $this->create_checkout();
@@ -114,9 +119,7 @@ class Pro_Service_Marketplace {
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 
         try {
-            $event = \Stripe\Webhook::constructEvent(
-                $payload, $sig_header, $this->webhook_secret
-            );
+            $event = \Stripe\Webhook::constructEvent($payload, $sig_header, $this->webhook_secret);
         } catch (Exception $e) {
             return new WP_REST_Response('Invalid', 400);
         }
@@ -126,7 +129,6 @@ class Pro_Service_Marketplace {
 
             $service_id = $session->metadata->service_id;
             $user_id = $session->metadata->user_id;
-
             $service = get_post($service_id);
 
             $order_id = wp_insert_post([
@@ -158,10 +160,69 @@ class Pro_Service_Marketplace {
         foreach($orders as $order) {
             echo '<div>';
             echo '<strong>'.$order->post_title.'</strong>';
+            echo '<a href="?order_id='.$order->ID.'">View</a>';
             echo '</div>';
         }
 
+        if(isset($_GET['order_id'])) {
+            echo $this->render_messages(intval($_GET['order_id']));
+        }
+
         return ob_get_clean();
+    }
+
+    private function render_messages($order_id) {
+        $messages = get_posts([
+            'post_type'=>'psm_message',
+            'meta_key'=>'order_id',
+            'meta_value'=>$order_id,
+            'orderby'=>'date',
+            'order'=>'ASC'
+        ]);
+
+        ob_start();
+
+        echo '<h3>Conversation</h3>';
+
+        foreach($messages as $msg) {
+            $author = get_userdata($msg->post_author);
+            echo '<div style="margin-bottom:10px;">';
+            echo '<strong>'.$author->display_name.':</strong>';
+            echo '<p>'.esc_html($msg->post_content).'</p>';
+            echo '</div>';
+        }
+
+        ?>
+        <form method="post" action="<?php echo admin_url('admin-post.php'); ?>">
+            <?php wp_nonce_field('psm_message','psm_msg_nonce'); ?>
+            <input type="hidden" name="action" value="psm_send_message">
+            <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
+            <textarea name="message" required placeholder="Type your message..."></textarea>
+            <button type="submit">Send</button>
+        </form>
+        <?php
+
+        return ob_get_clean();
+    }
+
+    public function send_message() {
+        if(!is_user_logged_in()) wp_die('Login required');
+        if(!wp_verify_nonce($_POST['psm_msg_nonce'],'psm_message')) wp_die('Invalid');
+
+        $order_id = intval($_POST['order_id']);
+        $message = sanitize_textarea_field($_POST['message']);
+
+        $msg_id = wp_insert_post([
+            'post_type'=>'psm_message',
+            'post_content'=>$message,
+            'post_status'=>'publish',
+            'post_author'=>get_current_user_id()
+        ]);
+
+        update_post_meta($msg_id,'order_id',$order_id);
+
+        wp_redirect(wp_get_referer());
+        exit;
     }
 }
 
