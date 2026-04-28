@@ -33,6 +33,8 @@ add_action('init', function() {
         }
     ]);
 });
+
+wp_enqueue_style('sso-css', plugin_dir_url(__FILE__) . 'sso.css');
     }
 
     public function register_post_types() {
@@ -59,13 +61,29 @@ add_action('init', function() {
 
     public function order_form_shortcode($atts) {
         ob_start(); ?>
-        <form id="sso-order-form" enctype="multipart/form-data">
-            <input type="text" name="name" placeholder="Your Name" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <textarea name="requirements" placeholder="Describe your needs"></textarea>
-            <input type="file" name="file">
-            <button type="submit">Submit Order</button>
-        </form>
+        <form id="sso-order-form" class="sso-form" enctype="multipart/form-data">
+    <div class="sso-field">
+        <label>Name</label>
+        <input type="text" name="name" required>
+    </div>
+
+    <div class="sso-field">
+        <label>Email</label>
+        <input type="email" name="email" required>
+    </div>
+
+    <div class="sso-field">
+        <label>Project Details</label>
+        <textarea name="requirements"></textarea>
+    </div>
+
+    <div class="sso-field">
+        <label>Upload Files</label>
+        <input type="file" name="file">
+    </div>
+
+    <button class="sso-submit">Submit Order</button>
+</form>
         <div id="sso-response"></div>
         <?php return ob_get_clean();
     }
