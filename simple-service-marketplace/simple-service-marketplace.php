@@ -16,6 +16,23 @@ class SSO_Plugin {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_action('wp_ajax_sso_submit_order', [$this, 'handle_order']);
         add_action('wp_ajax_nopriv_sso_submit_order', [$this, 'handle_order']);
+
+add_action('init', function() {
+    wp_register_script(
+        'sso-block',
+        plugin_dir_url(__FILE__) . 'block.js',
+        ['wp-blocks', 'wp-element', 'wp-editor'],
+        null,
+        true
+    );
+
+    register_block_type('sso/order-form', [
+        'editor_script' => 'sso-block',
+        'render_callback' => function($attributes) {
+            return do_shortcode('[sso_order_form]');
+        }
+    ]);
+});
     }
 
     public function register_post_types() {
