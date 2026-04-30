@@ -1,0 +1,29 @@
+jQuery(document).ready(function($) {
+    $('#sso-order-form').on('submit', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+
+        formData.append('action', 'sso_submit_order');
+
+        $.ajax({
+            url: sso_ajax.url,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                if (response.success) {
+                    $('#sso-response').html(
+                        '<p>Order submitted! <a href=\"' + response.data.link + '\">View your order</a></p>'
+                    );
+                } else {
+                    $('#sso-response').html('<p>Error submitting order</p>');
+                }
+            },
+            error: function() {
+                $('#sso-response').html('<p>Server error</p>');
+            }
+        });
+    });
+});
