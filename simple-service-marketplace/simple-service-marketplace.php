@@ -40,6 +40,48 @@ class SSO_Plugin
         add_action('wp_enqueue_scripts', function () {
             wp_enqueue_style('sso-css', plugin_dir_url(__FILE__) . 'sso.css');
         });
+
+add_action('add_meta_boxes', function() {
+    add_meta_box(
+        'sso_order_details',
+        'Order Details',
+        'sso_render_order_details',
+        'sso_order',
+        'normal',
+        'high'
+    );
+});
+
+function sso_render_order_details($post) {
+    $email = get_post_meta($post->ID, 'email', true);
+    $requirements = get_post_meta($post->ID, 'requirements', true);
+    $file_id = get_post_meta($post->ID, 'file', true);
+
+    echo '<p><strong>Email:</strong> ' . esc_html($email) . '</p>';
+
+    echo '<p><strong>Requirements:</strong><br>' . nl2br(esc_html($requirements)) . '</p>';
+
+    if ($file_id) {
+        $url = wp_get_attachment_url($file_id);
+        echo '<p><strong>File:</strong> <a href="' . esc_url($url) . '" target="_blank">Download</a></p>';
+    }
+}
+
+add_filter('manage_sso_order_posts_columns', function($columns) {
+    $columns['email'] = 'Email';
+    $columns['status'] = 'Status';
+    return $columns;
+});
+
+add_action('manage_sso_order_posts_custom_column', function($column, $post_id) {
+    if ($column === 'email') {
+        echo esc_html(get_post_meta($post_id, 'email', true));
+    }
+
+    if ($column === 'status') {
+        echo esc_html(get_post_meta($post_id, 'status', true) ?: 'New');
+    }
+}, 10, 2);
     }
 
     public function register_post_types()
@@ -107,6 +149,8 @@ class SSO_Plugin
             'post_title' => 'Order - ' . $name,
             'post_status' => 'publish'
         ]);
+
+update_post_meta($order_id, 'status', 'Pending');
 
         update_post_meta($order_id, 'email', $email);
         update_post_meta($order_id, 'requirements', $requirements);
