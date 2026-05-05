@@ -222,6 +222,8 @@ add_shortcode('sso_order_view', function () {
             'post_status' => 'publish'
         ]);
         update_post_meta($msg_id, 'order_id', $id);
+        update_post_meta($msg_id, 'sender', 'client'); // or 'admin'
+        update_post_meta($msg_id, 'type', 'message'); // message | status | system
         echo '<p>Message sent</p>';
     }
 
