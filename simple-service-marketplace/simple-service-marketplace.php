@@ -207,6 +207,19 @@ add_shortcode('sso_order_view', function () {
     if ($key !== $saved_key)
         return 'Invalid access';
 
+    if (isset($_POST['send_msg'])) {
+        $msg = sanitize_textarea_field($_POST['message']);
+        $msg_id = wp_insert_post([
+            'post_type' => 'sso_message',
+            'post_content' => $msg,
+            'post_status' => 'publish'
+        ]);
+        update_post_meta($msg_id, 'order_id', $id);
+        update_post_meta($msg_id, 'sender', 'client'); // or 'admin'
+        update_post_meta($msg_id, 'type', 'message'); // message | status | system
+        echo '<p>Message sent</p>';
+    }
+
     ob_start();
 
     echo '<h2>Order Details</h2>';
@@ -224,25 +237,10 @@ add_shortcode('sso_order_view', function () {
         echo '<div>' . esc_html($msg->post_content) . '</div>';
     }
 
-    ?>
-    <form method="post">
-        <textarea name="message"></textarea>
-        <button name="send_msg">Send</button>
-    </form>
-    <?php
-
-    if (isset($_POST['send_msg'])) {
-        $msg = sanitize_textarea_field($_POST['message']);
-        $msg_id = wp_insert_post([
-            'post_type' => 'sso_message',
-            'post_content' => $msg,
-            'post_status' => 'publish'
-        ]);
-        update_post_meta($msg_id, 'order_id', $id);
-        update_post_meta($msg_id, 'sender', 'client'); // or 'admin'
-        update_post_meta($msg_id, 'type', 'message'); // message | status | system
-        echo '<p>Message sent</p>';
-    }
+    echo '<form method="post">';
+    echo '<textarea name="message"></textarea>';
+    echo '<button type="submit" name="send_msg">Send</button>';
+    echo '</form>';
 
     return ob_get_clean();
 });

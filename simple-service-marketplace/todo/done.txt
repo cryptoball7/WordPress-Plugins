@@ -1,0 +1,9 @@
+DONE
+5:58 PM 5/8/2026
+
+It was because of WordPress adding unexpected "<code>" tags around the <form> element. Removing whitespace solved the layout issue, but a <code> tag is still being added around the send button for an unknown reason.
+
+ADDED
+6:26 PM 5/7/2026
+
+Find out why textarea is not aligned properly on order page (e.g. /order-view/?id=202&key=OIHRuam9ZbXIREmB6EoJ)

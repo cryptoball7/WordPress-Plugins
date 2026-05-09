@@ -1,3 +1,0 @@
-6:26 PM 5/7/2026
-
-Find out why textarea is not aligned properly on order page (e.g. /order-view/?id=202&key=OIHRuam9ZbXIREmB6EoJ)
