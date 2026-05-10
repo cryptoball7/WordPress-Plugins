@@ -57,6 +57,7 @@ class SSO_Plugin
             $email = get_post_meta($post->ID, 'email', true);
             $requirements = get_post_meta($post->ID, 'requirements', true);
             $file_id = get_post_meta($post->ID, 'file', true);
+            $link = get_post_meta($post->ID, 'link', true);
 
             echo '<p><strong>Email:</strong> ' . esc_html($email) . '</p>';
 
@@ -66,6 +67,8 @@ class SSO_Plugin
                 $url = wp_get_attachment_url($file_id);
                 echo '<p><strong>File:</strong> <a href="' . esc_url($url) . '" target="_blank">Download</a></p>';
             }
+
+            echo '<p><strong>Link:</strong> <a href="' . esc_html($link) . '">' . esc_html($link) . '</a></p>';
         }
 
         add_filter('manage_sso_order_posts_columns', function ($columns) {
@@ -182,6 +185,8 @@ class SSO_Plugin
         update_post_meta($order_id, 'secret', $secret);
 
         $link = site_url('/order-view/?id=' . $order_id . '&key=' . $secret);
+
+        update_post_meta($order_id, 'link', $link);
 
         wp_send_json_success(['link' => $link]);
     }
