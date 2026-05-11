@@ -172,6 +172,7 @@ class SSO_Plugin
 
         update_post_meta($order_id, 'status', 'Pending');
 
+        update_post_meta($order_id, 'name', $name);
         update_post_meta($order_id, 'email', $email);
         update_post_meta($order_id, 'requirements', $requirements);
 
