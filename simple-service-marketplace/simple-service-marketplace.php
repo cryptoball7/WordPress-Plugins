@@ -54,10 +54,13 @@ class SSO_Plugin
 
         function sso_render_order_details($post)
         {
+            $name = get_post_meta($post->ID, 'name', true);
             $email = get_post_meta($post->ID, 'email', true);
             $requirements = get_post_meta($post->ID, 'requirements', true);
             $file_id = get_post_meta($post->ID, 'file', true);
             $link = get_post_meta($post->ID, 'link', true);
+
+            echo '<p><strong>Name:</strong> ' . esc_html($name) . '</p>';
 
             echo '<p><strong>Email:</strong> ' . esc_html($email) . '</p>';
 
