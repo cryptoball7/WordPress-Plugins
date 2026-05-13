@@ -216,6 +216,18 @@ add_shortcode('sso_order_view', function () {
     if ($key !== $saved_key)
         return 'Invalid access';
 
+    $current_user = wp_get_current_user();
+
+    $name = $current_user->display_name;
+
+    if("" == $name) {
+        $name = $current_user->user_login;
+
+        if("" == $name) {
+            $name = get_post_meta($id, 'name', true);
+        }
+    }
+
     if (isset($_POST['send_msg'])) {
         $msg = sanitize_textarea_field($_POST['message']);
         $msg_id = wp_insert_post([
@@ -224,7 +236,7 @@ add_shortcode('sso_order_view', function () {
             'post_status' => 'publish'
         ]);
         update_post_meta($msg_id, 'order_id', $id);
-        update_post_meta($msg_id, 'sender', 'client'); // or 'admin'
+        update_post_meta($msg_id, 'sender', $name); // or 'admin'
         update_post_meta($msg_id, 'type', 'message'); // message | status | system
         echo '<p>Message sent</p>';
     }
@@ -243,10 +255,12 @@ add_shortcode('sso_order_view', function () {
     ]);
 
     foreach ($messages as $msg) {
+        echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
         echo '<div>' . esc_html($msg->post_content) . '</div>';
     }
 
     echo '<form method="post">';
+    echo '<div><strong>'. $name .'</strong></div>';
     echo '<textarea name="message"></textarea>';
     echo '<button type="submit" name="send_msg">Send</button>';
     echo '</form>';
