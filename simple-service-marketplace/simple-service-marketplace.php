@@ -105,72 +105,6 @@ class SSO_Plugin
             }
         });
 
-        add_action('rest_api_init', function () {
-
-            register_rest_route('sso/v1', '/messages/(?P<order_id>\\d+)', [
-                'methods' => 'GET',
-                'callback' => 'sso_get_messages',
-                'permission_callback' => '__return_true'
-            ]);
-
-            register_rest_route('sso/v1', '/messages/send', [
-                'methods' => 'POST',
-                'callback' => 'sso_send_message_rest',
-                'permission_callback' => '__return_true'
-            ]);
-        });
-
-        function sso_get_messages($request)
-        {
-
-            $order_id = intval($request['order_id']);
-
-            $messages = get_posts([
-                'post_type' => 'sso_message',
-                'meta_key' => 'order_id',
-                'meta_value' => $order_id,
-                'orderby' => 'date',
-                'order' => 'ASC',
-                'numberposts' => -1
-            ]);
-
-            $data = [];
-
-            foreach ($messages as $msg) {
-
-                $data[] = [
-                    'id' => $msg->ID,
-                    'content' => $msg->post_content,
-                    'date' => $msg->post_date,
-                    'sender' => get_post_meta($msg->ID, 'sender', true)
-                ];
-            }
-
-            return rest_ensure_response($data);
-        }
-
-        function sso_send_message_rest($request)
-        {
-
-            $order_id = intval($request['order_id']);
-            $message = sanitize_textarea_field($request['message']);
-
-            $msg_id = wp_insert_post([
-                'post_type' => 'sso_message',
-                'post_content' => $message,
-                'post_status' => 'publish'
-            ]);
-
-            update_post_meta($msg_id, 'order_id', $order_id);
-            update_post_meta($msg_id, 'sender', 'client');
-
-            return rest_ensure_response([
-                'success' => true
-            ]);
-        }
-
-
-
     }
 
     public function register_post_types()
@@ -273,21 +207,63 @@ add_action('init', function () {
     ]);
 });
 
-add_shortcode('sso_order_view', function() {
-
+add_shortcode('sso_order_view', function () {
     $id = intval($_GET['id']);
     $key = sanitize_text_field($_GET['key']);
 
+    $saved_key = get_post_meta($id, 'secret', true);
+
+    if ($key !== $saved_key)
+        return 'Invalid access';
+
+    $current_user = wp_get_current_user();
+
+    $name = $current_user->display_name;
+
+    if("" == $name) {
+        $name = $current_user->user_login;
+
+        if("" == $name) {
+            $name = get_post_meta($id, 'name', true);
+        }
+    }
+
+    if (isset($_POST['send_msg'])) {
+        $msg = sanitize_textarea_field($_POST['message']);
+        $msg_id = wp_insert_post([
+            'post_type' => 'sso_message',
+            'post_content' => $msg,
+            'post_status' => 'publish'
+        ]);
+        update_post_meta($msg_id, 'order_id', $id);
+        update_post_meta($msg_id, 'sender', $name); // or 'admin'
+        update_post_meta($msg_id, 'type', 'message'); // message | status | system
+        echo '<p>Message sent</p>';
+    }
+
     ob_start();
-    ?>
 
-    <div
-        id="sso-app"
-        data-order="<?php echo esc_attr($id); ?>"
-        data-key="<?php echo esc_attr($key); ?>">
-    </div>
+    echo '<h2>Order Details</h2>';
+    echo '<p>' . esc_html(get_post_meta($id, 'requirements', true)) . '</p>';
 
-    <?php
+    echo '<h3>Messages</h3>';
+
+    $messages = get_posts([
+        'post_type' => 'sso_message',
+        'meta_key' => 'order_id',
+        'meta_value' => $id
+    ]);
+
+    foreach ($messages as $msg) {
+        echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
+        echo '<div>' . esc_html($msg->post_content) . '</div>';
+    }
+
+    echo '<form method="post">';
+    echo '<div><strong>'. $name .'</strong></div>';
+    echo '<textarea name="message"></textarea>';
+    echo '<button type="submit" name="send_msg">Send</button>';
+    echo '</form>';
 
     return ob_get_clean();
 });
