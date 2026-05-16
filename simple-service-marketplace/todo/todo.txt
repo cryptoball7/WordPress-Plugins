@@ -1,10 +1,6 @@
-7:04 PM 5/9/2026
+5:48 PM 5/15/2026
 
-Add identifier (username or seller name for seller and for client, email? name? anonymous + number?) to messages
-
-7:04 PM 5/9/2026
-
-Add link to service in order meta
+Sort out the sso-timeline mess
 
 7:04 PM 5/9/2026
 

@@ -105,6 +105,38 @@ class SSO_Plugin
             }
         });
 
+add_action('wp_ajax_sso_get_messages', 'sso_get_messages');
+add_action('wp_ajax_nopriv_sso_get_messages', 'sso_get_messages');
+
+function sso_get_messages() {
+
+    $order_id = intval($_POST['order_id']);
+
+    $messages = get_posts([
+        'post_type' => 'sso_message',
+        'meta_key' => 'order_id',
+        'meta_value' => $order_id,
+        'orderby' => 'date',
+        'order' => 'ASC',
+        'numberposts' => -1
+    ]);
+
+    $data = [];
+
+    foreach ($messages as $msg) {
+
+        $data[] = [
+            'id' => $msg->ID,
+            'content' => wpautop($msg->post_content),
+            'sender' => get_post_meta($msg->ID, 'sender', true),
+            'date' => get_the_date('M j, g:i A', $msg)
+        ];
+    }
+
+    wp_send_json_success($data);
+}
+
+
     }
 
     public function register_post_types()
