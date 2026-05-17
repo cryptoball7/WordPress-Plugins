@@ -300,6 +300,26 @@ add_shortcode('sso_order_view', function () {
     return ob_get_clean();
 });
 
+add_action('wp_ajax_sso_send_message', 'sso_send_message');
+add_action('wp_ajax_nopriv_sso_send_message', 'sso_send_message');
+
+function sso_send_message() {
+    $order_id = intval($_POST['order_id']);
+    $message = sanitize_textarea_field($_POST['message']);
+
+    $msg_id = wp_insert_post([
+        'post_type' => 'sso_message',
+        'post_content' => $message,
+        'post_status' => 'publish'
+    ]);
+
+    update_post_meta($msg_id, 'order_id', $order_id);
+    update_post_meta($msg_id, 'sender', 'client');
+
+    wp_send_json_success();
+}
+
+
 // WooCommerce integration toggle
 add_action('plugins_loaded', function () {
     if (class_exists('WooCommerce')) {

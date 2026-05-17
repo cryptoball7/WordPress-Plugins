@@ -34,3 +34,68 @@
     border-radius: 6px;
     cursor: pointer;
 }
+
+.sso-order {
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.sso-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sso-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    background: #eee;
+}
+
+.sso-status-pending { background: #ffe08a; }
+.sso-status-in-progress { background: #a0e7e5; }
+.sso-status-completed { background: #b4f8c8; }
+
+.sso-box {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.sso-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sso-item {
+    display: flex;
+}
+
+.sso-client {
+    justify-content: flex-end;
+}
+
+.sso-admin {
+    justify-content: flex-start;
+}
+
+.sso-bubble {
+    max-width: 70%;
+    padding: 12px;
+    border-radius: 10px;
+    background: #f1f1f1;
+}
+
+.sso-client .sso-bubble {
+    background: #d1e7ff;
+}
+
+.sso-meta {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-bottom: 5px;
+}
