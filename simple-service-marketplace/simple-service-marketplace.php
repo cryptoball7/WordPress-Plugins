@@ -195,6 +195,7 @@ function sso_get_messages() {
 
     public function handle_order()
     {
+        error_log("[sso] handle_order() called\n");
         $name = sanitize_text_field($_POST['name']);
         $email = sanitize_email($_POST['email']);
         $requirements = sanitize_textarea_field($_POST['requirements']);
