@@ -289,13 +289,19 @@ add_shortcode('sso_order_view', function () {
 
     foreach ($messages as $msg) {
         echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
+        echo '<div>' . $msg->post_date . '</div>';
         echo '<div>' . esc_html($msg->post_content) . '</div>';
     }
 
-    echo '<form method="post">';
-    echo '<div><strong>'. $name .'</strong></div>';
-    echo '<textarea name="message"></textarea>';
-    echo '<button type="submit" name="send_msg">Send</button>';
+    echo '<form method="post" class="sso-form">';
+    echo '<div class="sso-field">'
+          .'<label>Your name:</label>'
+          .'<strong>'. $name .'</strong>'
+        .'</div>';
+    echo '<div class="sso-field">'
+          .'<textarea name="message"></textarea>'
+        .'</div>';
+    echo '<button type="submit" name="send_msg" class="sso-submit">Send</button>';
     echo '</form>';
 
     return ob_get_clean();
