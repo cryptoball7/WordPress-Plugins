@@ -1,14 +1,4 @@
-$('#sso-message-form').on('submit', function(e) {
-    e.preventDefault();
 
-    $.post(sso_ajax.url, {
-        action: 'sso_send_message',
-        order_id: $('input[name="order_id"]').val(),
-        message: $('textarea[name="message"]').val()
-    }, function() {
-        location.reload(); // later: replace with live append
-    });
-});
 
 
 jQuery(document).ready(function($) {
@@ -38,5 +28,18 @@ jQuery(document).ready(function($) {
                 $('#sso-response').html('<p>Server error</p>');
             }
         });
+
+        $('#sso-message-form').on('submit', function(e) {
+            e.preventDefault();
+        
+            $.post(sso_ajax.url, {
+                action: 'sso_send_message',
+                order_id: $('input[name="order_id"]').val(),
+                message: $('textarea[name="message"]').val()
+            }, function() {
+                location.reload(); // later: replace with live append
+            });
+        });
+
     });
 });
