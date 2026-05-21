@@ -289,8 +289,8 @@ add_shortcode('sso_order_view', function () {
 
     foreach ($messages as $msg) {
         echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
-        echo '<div>' . $msg->post_date . '</div>';
-        echo '<div>' . esc_html($msg->post_content) . '</div>';
+        echo '<div class="sso-date">' . $msg->post_date . '</div>';
+        echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
     }
 
     echo '<form method="post" class="sso-form">';

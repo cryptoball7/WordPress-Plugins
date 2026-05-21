@@ -1,3 +1,12 @@
+.sso-date {
+    margin-top: 0em;
+    color: #777;
+}
+
+.sso-message-body {
+    margin-top: 0.3em;
+}
+
 .sso-form {
     max-width: 600px;
     margin: 40px auto;
