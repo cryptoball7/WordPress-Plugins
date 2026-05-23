@@ -276,6 +276,8 @@ add_shortcode('sso_order_view', function () {
 
     ob_start();
 
+    echo '<div class="sso-order" id="sso-order">';
+
     echo '<h2>Order Details</h2>';
     echo '<p>' . esc_html(get_post_meta($id, 'requirements', true)) . '</p>';
 
@@ -303,6 +305,8 @@ add_shortcode('sso_order_view', function () {
         .'</div>';
     echo '<button type="submit" name="send_msg" class="sso-submit">Send</button>';
     echo '</form>';
+
+    echo '</div>';
 
     return ob_get_clean();
 });
