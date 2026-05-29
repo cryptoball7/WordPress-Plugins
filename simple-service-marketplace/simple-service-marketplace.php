@@ -276,25 +276,29 @@ add_shortcode('sso_order_view', function () {
 
     ob_start();
 
-    echo '<div class="sso-order" id="sso-order">';
+    ?>
 
-    echo '<h2>Order Details</h2>';
-    echo '<p>' . esc_html(get_post_meta($id, 'requirements', true)) . '</p>';
+<div class="sso-order" id="sso-order">
 
-    echo '<h3>Send Message</h3>';
+<h2>Order Details</h2>
+<p><?php echo esc_html(get_post_meta($id, 'requirements', true)); ?></p>
 
-    echo '<form method="post" class="sso-form">';
-    echo '<div class="sso-field">'
-          .'<label>Your name:</label>'
-          .'<strong>'. $name .'</strong>'
-        .'</div>';
-    echo '<div class="sso-field">'
-          .'<textarea name="message"></textarea>'
-        .'</div>';
-    echo '<button type="submit" name="send_msg" class="sso-submit">Send</button>';
-    echo '</form>';
+<h3>Send Message</h3>
 
-    echo '<h3>Messages</h3>';
+<form method="post" class="sso-form">
+  <div class="sso-field">
+    <label>Your name:</label>
+    <strong><?php echo $name; ?></strong>
+  </div>
+  <div class="sso-field">
+    <textarea name="message"></textarea>
+  </div>
+  <button type="submit" name="send_msg" class="sso-submit">Send</button>
+</form>
+
+<h3>Messages</h3>
+
+<?php
 
     $messages = get_posts([
         'post_type' => 'sso_message',
