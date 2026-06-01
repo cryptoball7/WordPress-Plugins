@@ -137,6 +137,53 @@ class SSO_Plugin
             wp_send_json_success($data);
         }
 
+        // Message Update Handler
+        add_action('rest_api_init', function () {
+
+    register_rest_route(
+        'simple-service-marketplace/v1',
+        '/chat-updates',
+        [
+            'methods'  => 'GET',
+            'callback' => 'myplugin_chat_updates',
+            'permission_callback' => '__return_true'
+        ]
+    );
+});
+
+function myplugin_chat_updates($request) {
+
+    global $wpdb;
+
+    $order_id = (int)
+        $request->get_param('order_id');
+
+    $after = (int)
+        $request->get_param('after');
+
+    $table =
+        $wpdb->prefix .
+        'order_messages';
+
+    $messages = $wpdb->get_results(
+        $wpdb->prepare(
+            "
+            SELECT *
+            FROM $table
+            WHERE order_id = %d
+            AND id > %d
+            ORDER BY id ASC
+            ",
+            $order_id,
+            $after
+        ),
+        ARRAY_A
+    );
+
+    return rest_ensure_response(
+        $messages
+    );
+}
 
     }
 
