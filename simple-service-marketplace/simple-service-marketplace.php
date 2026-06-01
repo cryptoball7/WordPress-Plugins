@@ -105,36 +105,37 @@ class SSO_Plugin
             }
         });
 
-add_action('wp_ajax_sso_get_messages', 'sso_get_messages');
-add_action('wp_ajax_nopriv_sso_get_messages', 'sso_get_messages');
+        add_action('wp_ajax_sso_get_messages', 'sso_get_messages');
+        add_action('wp_ajax_nopriv_sso_get_messages', 'sso_get_messages');
 
-function sso_get_messages() {
+        function sso_get_messages()
+        {
 
-    $order_id = intval($_POST['order_id']);
+            $order_id = intval($_POST['order_id']);
 
-    $messages = get_posts([
-        'post_type' => 'sso_message',
-        'meta_key' => 'order_id',
-        'meta_value' => $order_id,
-        'orderby' => 'date',
-        'order' => 'ASC',
-        'numberposts' => -1
-    ]);
+            $messages = get_posts([
+                'post_type' => 'sso_message',
+                'meta_key' => 'order_id',
+                'meta_value' => $order_id,
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'numberposts' => -1
+            ]);
 
-    $data = [];
+            $data = [];
 
-    foreach ($messages as $msg) {
+            foreach ($messages as $msg) {
 
-        $data[] = [
-            'id' => $msg->ID,
-            'content' => wpautop($msg->post_content),
-            'sender' => get_post_meta($msg->ID, 'sender', true),
-            'date' => get_the_date('M j, g:i A', $msg)
-        ];
-    }
+                $data[] = [
+                    'id' => $msg->ID,
+                    'content' => wpautop($msg->post_content),
+                    'sender' => get_post_meta($msg->ID, 'sender', true),
+                    'date' => get_the_date('M j, g:i A', $msg)
+                ];
+            }
 
-    wp_send_json_success($data);
-}
+            wp_send_json_success($data);
+        }
 
 
     }
@@ -253,10 +254,10 @@ add_shortcode('sso_order_view', function () {
 
     $name = $current_user->display_name;
 
-    if("" == $name) {
+    if ("" == $name) {
         $name = $current_user->user_login;
 
-        if("" == $name) {
+        if ("" == $name) {
             $name = get_post_meta($id, 'name', true);
         }
     }
@@ -274,53 +275,66 @@ add_shortcode('sso_order_view', function () {
         echo '<p>Message sent</p>';
     }
 
-    ob_start();
-
-    ?>
-
-<div class="sso-order" id="sso-order">
-
-<h2>Order Details</h2>
-<p><?php echo esc_html(get_post_meta($id, 'requirements', true)); ?></p>
-
-<h3>Send Message</h3>
-
-<form method="post" class="sso-form">
-  <div class="sso-field">
-    <label>Your name:</label>
-    <strong><?php echo $name; ?></strong>
-  </div>
-  <div class="sso-field">
-    <textarea name="message"></textarea>
-  </div>
-  <button type="submit" name="send_msg" class="sso-submit">Send</button>
-</form>
-
-<h3>Messages</h3>
-
-<?php
-
     $messages = get_posts([
         'post_type' => 'sso_message',
         'meta_key' => 'order_id',
         'meta_value' => $id
     ]);
 
-    foreach ($messages as $msg) {
-        echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
-        echo '<div class="sso-date">' . $msg->post_date . '</div>';
-        echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
+    try
+    {
+        $last_message_id = $messages[0]->ID;
+    } catch (Exception $e) {
+        $last_message_id = 0;
     }
 
-    echo '</div>';
+    ob_start();
 
-    return ob_get_clean();
+    ?>
+
+    <script>
+        window.lastMessageId = <?php echo $last_message_id; ?>;
+        const ORDER_ID = <?php echo $id; ?>;
+    </script>
+
+    <div class="sso-order" id="sso-order">
+
+        <h2>Order Details</h2>
+        <p><?php echo esc_html(get_post_meta($id, 'requirements', true)); ?></p>
+
+        <h3>Send Message</h3>
+
+        <form method="post" class="sso-form">
+            <div class="sso-field">
+                <label>Your name:</label>
+                <strong><?php echo $name; ?></strong>
+            </div>
+            <div class="sso-field">
+                <textarea name="message"></textarea>
+            </div>
+            <button type="submit" name="send_msg" class="sso-submit">Send</button>
+        </form>
+
+        <h3>Messages</h3>
+
+        <?php
+
+        foreach ($messages as $msg) {
+            echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
+            echo '<div class="sso-date">' . $msg->post_date . '</div>';
+            echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
+        }
+
+        echo '</div>';
+
+        return ob_get_clean();
 });
 
 add_action('wp_ajax_sso_send_message', 'sso_send_message');
 add_action('wp_ajax_nopriv_sso_send_message', 'sso_send_message');
 
-function sso_send_message() {
+function sso_send_message()
+{
     $order_id = intval($_POST['order_id']);
     $message = sanitize_textarea_field($_POST['message']);
 
