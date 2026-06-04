@@ -1,5 +1,7 @@
 async function pollChat() {
 
+    console.log("pollChat() called!");
+
     try {
 
         const response =
