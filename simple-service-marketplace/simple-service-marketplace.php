@@ -138,53 +138,61 @@ class SSO_Plugin
         }
 
         // Message Update Handler //
-        add_action('rest_api_init', function () {
+add_action(
+    'wp_ajax_sso_chat_updates',
+    'sso_chat_updates'
+);
 
-            register_rest_route(
-                'simple-service-marketplace/v1',
-                '/chat-updates',
-                [
-                    'methods' => 'GET',
-                    'callback' => 'myplugin_chat_updates',
-                    'permission_callback' => '__return_true'
-                ]
-            );
-        });
+add_action(
+    'wp_ajax_nopriv_sso_chat_updates',
+    'sso_chat_updates'
+);
 
-        function myplugin_chat_updates($request)
-        {
+function sso_chat_updates() {
 
-            global $wpdb;
+    $order_id = (int)
+        ($_GET['order_id'] ?? 0);
 
-            $order_id = (int) 
-                $request->get_param('order_id');
+    $after = (int)
+        ($_GET['after'] ?? 0);
 
-            $after = (int) 
-                $request->get_param('after');
+    $messages = get_posts([
+        'post_type'      => 'sso_message',
+        'posts_per_page' => -1,
+        'orderby'        => 'ID',
+        'order'          => 'ASC',
+        'post__not_in'   => range(1, $after),
 
-            $table =
-                $wpdb->prefix .
-                'order_messages';
+        'meta_query' => [
+            [
+                'key'   => 'order_id',
+                'value' => $order_id
+            ]
+        ]
+    ]);
 
-            $messages = $wpdb->get_results(
-                $wpdb->prepare(
-                    "
-            SELECT *
-            FROM $table
-            WHERE order_id = %d
-            AND id > %d
-            ORDER BY id ASC
-            ",
-                    $order_id,
-                    $after
-                ),
-                ARRAY_A
-            );
+    $output = [];
 
-            return rest_ensure_response(
-                $messages
-            );
+    foreach ($messages as $msg) {
+
+        if ($msg->ID <= $after) {
+            continue;
         }
+
+        $output[] = [
+            'id'      => $msg->ID,
+            'sender'  => get_post_meta(
+                $msg->ID,
+                'sender',
+                true
+            ),
+            'date'    => $msg->post_date,
+            'message' => $msg->post_content
+        ];
+    }
+
+    wp_send_json($output);
+}
 
     }
 
@@ -339,10 +347,11 @@ add_shortcode('sso_order_view', function () {
 
     ?>
 
-    <script>
-        window.lastMessageId = <?php echo $last_message_id; ?>;
-        const ORDER_ID = <?php echo $id; ?>;
-    </script>
+<script>
+window.ssoOrderId = <?= (int) $id ?>;
+window.ssoLastMessageId =
+    <?= (int) $last_message_id ?>;
+</script>
 
     <div class="sso-order" id="sso-order">
 

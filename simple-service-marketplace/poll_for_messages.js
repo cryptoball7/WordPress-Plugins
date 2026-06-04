@@ -1,56 +1,88 @@
-let lastMessageId =
-    window.lastMessageId || 0;
-
-let pollTimeout;
-
 async function pollChat() {
-    try {
-        const response = await fetch(
-            `/wp-json/simple-service-marketplace/v1/chat-updates?order_id=${ORDER_ID}&after=${lastMessageId}`,
-            {
-                credentials: 'same-origin'
-            }
-        );
 
-        const messages = await response.json();
+    try {
+
+        const response =
+            await fetch(
+                `/wp-admin/admin-ajax.php?action=sso_chat_updates&order_id=${window.ssoOrderId}&after=${window.ssoLastMessageId}`
+            );
+
+        const messages =
+            await response.json();
 
         if (messages.length) {
-            messages.forEach(message => {
 
-                // TODO: implement appendMessage
-                appendMessage(message);
-
-                lastMessageId = Math.max(
-                    lastMessageId,
-                    message.id
+            const container =
+                document.getElementById(
+                    'sso-chat-messages'
                 );
+
+            messages.forEach(msg => {
+
+                const el =
+                    document.createElement(
+                        'div'
+                    );
+
+                el.className =
+                    'sso-message';
+
+                el.dataset.id =
+                    msg.id;
+
+                el.innerHTML = `
+                    <div>
+                        <strong>
+                            ${escapeHtml(msg.sender)}
+                        </strong>
+                    </div>
+
+                    <div class="sso-date">
+                        ${escapeHtml(msg.date)}
+                    </div>
+
+                    <div class="sso-message-body">
+                        ${escapeHtml(msg.message)}
+                    </div>
+                `;
+
+                container.appendChild(el);
+
+                window.ssoLastMessageId =
+                    Math.max(
+                        window.ssoLastMessageId,
+                        msg.id
+                    );
             });
+
+            container.scrollTop =
+                container.scrollHeight;
         }
 
-    } catch (error) {
+    } catch (e) {
         console.error(
-            'Chat polling failed:',
-            error
+            'Chat update failed',
+            e
         );
     }
 
-    const delay = document.hidden
-        ? 10000
-        : 2000;
-
-    pollTimeout = setTimeout(
+    setTimeout(
         pollChat,
-        delay
+        document.hidden
+            ? 10000
+            : 2000
     );
 }
 
-document.addEventListener(
-    'visibilitychange',
-    () => {
-        clearTimeout(pollTimeout);
-        pollChat();
-    }
-);
+function escapeHtml(text) {
+    const div =
+        document.createElement(
+            'div'
+        );
 
-// start polling
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
 pollChat();
