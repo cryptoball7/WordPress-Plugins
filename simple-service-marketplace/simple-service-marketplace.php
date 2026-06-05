@@ -218,6 +218,29 @@ function sso_chat_updates() {
         wp_localize_script('sso-js', 'sso_ajax', [
             'url' => admin_url('admin-ajax.php')
         ]);
+
+
+    global $post;
+
+    if (
+        is_a($post, 'WP_Post') &&
+        has_shortcode(
+            $post->post_content,
+            'sso_order_view'
+        )
+    ) {
+
+        wp_enqueue_script(
+            'sso-chat-live',
+            plugin_dir_url(__FILE__) .
+            'poll_for_messages.js',
+            [],
+            '1.0',
+            true
+        );
+    }
+
+
     }
 
     public function order_form_shortcode($atts)
