@@ -396,6 +396,7 @@ window.ssoLastMessageId =
 
         <h3>Messages</h3>
 
+        <div id="sso-chat-messages">
         <?php
 
         foreach ($messages as $msg) {
@@ -404,7 +405,10 @@ window.ssoLastMessageId =
             echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
         }
 
-        echo '</div>';
+        ?>
+        </div>
+    </div>
+        <?php
 
         return ob_get_clean();
 });
