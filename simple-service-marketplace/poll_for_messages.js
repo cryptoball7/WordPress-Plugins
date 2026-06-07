@@ -51,7 +51,7 @@ async function pollChat() {
                     </div>
                 `;
 
-                container.appendChild(el);
+                container.prepend(el);
 
                 window.ssoLastMessageId =
                     Math.max(
