@@ -29,17 +29,27 @@ jQuery(document).ready(function($) {
             }
         });
 
-        $('#sso-message-form').on('submit', function(e) {
-            e.preventDefault();
-        
-            $.post(sso_ajax.url, {
-                action: 'sso_send_message',
-                order_id: $('input[name="order_id"]').val(),
-                message: $('textarea[name="message"]').val()
-            }, function() {
-                location.reload(); // later: replace with live append
-            });
-        });
-
     });
+
+$('#sso-message-form').on('submit', function(e) {
+    e.preventDefault();
+
+    const form = $(this);
+
+    $.ajax({
+        url: window.location.href,
+        type: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+            console.log('Submitted');
+
+            // Clear textarea
+            form.find('textarea[name="message"]').val('');
+
+            // Later: append message to DOM
+        }
+    });
+});
+
+
 });

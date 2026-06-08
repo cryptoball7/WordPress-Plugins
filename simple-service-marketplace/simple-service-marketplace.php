@@ -383,7 +383,7 @@ window.ssoLastMessageId =
 
         <h3>Send Message</h3>
 
-        <form method="post" class="sso-form">
+        <form method="post" class="sso-form" id="sso-message-form">
             <div class="sso-field">
                 <label>Your name:</label>
                 <strong><?php echo $name; ?></strong>
