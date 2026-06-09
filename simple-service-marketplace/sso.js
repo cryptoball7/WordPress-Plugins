@@ -34,12 +34,20 @@ jQuery(document).ready(function($) {
 $('#sso-message-form').on('submit', function(e) {
     e.preventDefault();
 
+    var formData = new FormData(this);
+
+console.log(formData);
+
+    formData.append('send_msg', '');
+
     const form = $(this);
 
     $.ajax({
         url: window.location.href,
         type: 'POST',
-        data: form.serialize(),
+        data: formData,
+        contentType: false,
+        processData: false,
         success: function(response) {
             console.log('Submitted');
 
