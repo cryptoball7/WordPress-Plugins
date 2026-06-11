@@ -36,8 +36,6 @@ $('#sso-message-form').on('submit', function(e) {
 
     var formData = new FormData(this);
 
-console.log(formData);
-
     formData.append('send_msg', '');
 
     const form = $(this);
@@ -49,12 +47,8 @@ console.log(formData);
         contentType: false,
         processData: false,
         success: function(response) {
-            console.log('Submitted');
-
             // Clear textarea
             form.find('textarea[name="message"]').val('');
-
-            // Later: append message to DOM
         }
     });
 });
