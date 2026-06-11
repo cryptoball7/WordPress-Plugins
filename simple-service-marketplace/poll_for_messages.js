@@ -1,9 +1,5 @@
 
-console.log("poll_for_messages.js begun.");
-
 async function pollChat() {
-
-    console.log("pollChat() called!");
 
     try {
 
@@ -90,8 +86,4 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-console.log("pollChat defined.");
-
 pollChat();
-
-console.log("poll_for_messages end reached.");
