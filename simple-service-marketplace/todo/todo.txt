@@ -1,34 +1,6 @@
-4:33 PM 6/7/2026
-
-Fix page reload on message form submission
-
-8:24 AM 6/6/2026
-
-Remove console.log statements from poll_for_messages.js
-
-5:03 PM 6/2/2026
-
-Rollback changes for live messages. Try again with new implementation.
-
 4:18 PM 6/1/2026
 
 Add permission callback for live polling that checks whether the correct secret key value
-
-4:18 PM 6/1/2026
-
-Test backend for live message polling
-
-8:55 AM 5/30/2026
-
-Set up backend for live message polling
-
-8:55 AM 5/30/2026
-
-Implement appendMessage in poll_for_messages.js
-
-9:09 PM 5/27/2026
-
-Fix the spacing and grouping of elements on order page
 
 12:10 AM 5/21/2026
 
@@ -38,6 +10,3 @@ Add option for email notifications for orders and messages
 
 Allow pasting of images in message input
 
-12:09 AM 5/21/2026
-
-Make messages live update automatically
