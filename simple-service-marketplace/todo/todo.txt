@@ -1,7 +1,3 @@
-4:18 PM 6/1/2026
-
-Add permission callback for live polling that checks whether the correct secret key value
-
 12:10 AM 5/21/2026
 
 Add option for email notifications for orders and messages

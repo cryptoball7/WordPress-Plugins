@@ -1,4 +1,14 @@
 DONE
+2:09 PM 6/13/2026
+
+Looks like it already does because polling is handled by shortcode 'sso_order_view' which checks for the key before doing almost everything else
+
+ADDED
+4:18 PM 6/1/2026
+
+Add permission callback for live polling that checks whether the correct secret key value
+
+DONE
 9:04 AM 6/12/2026
 
 ADDED

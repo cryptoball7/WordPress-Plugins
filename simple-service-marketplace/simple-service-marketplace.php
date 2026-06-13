@@ -245,16 +245,43 @@ function sso_chat_updates() {
 
     public function order_form_shortcode($atts)
     {
+        if ( is_user_logged_in() ) {
+            $current_user = wp_get_current_user();
+
+            $name = $current_user->display_name;
+
+            if ("" == $name) {
+                $name = $current_user->user_login;
+            }
+
+            $email = $current_user->user_email;
+        } else {
+            $name = "";
+            $email = "";
+        }
+
+        if("" != $name) {
+            $name_disabled = "disabled";
+        } else {
+            $name_disabled = "";
+        }
+
+        if("" != $email) {
+            $email_disabled = "disabled";
+        } else {
+            $email_disabled = "";
+        }
+
         ob_start(); ?>
         <form id="sso-order-form" class="sso-form" enctype="multipart/form-data">
             <div class="sso-field">
                 <label>Name</label>
-                <input type="text" name="name" required>
+                <input type="text" name="name" value="<?php echo $name; ?>" <?php echo $name_disabled; ?> required>
             </div>
 
             <div class="sso-field">
                 <label>Email</label>
-                <input type="email" name="email" required>
+                <input type="email" name="email" value="<?php echo $email; ?>" <?php echo $name_disabled; ?> required>
             </div>
 
             <div class="sso-field">
@@ -361,7 +388,11 @@ add_shortcode('sso_order_view', function () {
     ]);
 
     try {
-        $last_message_id = $messages[0]->ID;
+        if(array_key_exists(0, $messages) && property_exists($messages[0], "ID")) {
+            $last_message_id = $messages[0]->ID;
+        } else {
+            $last_message_id = 0;
+        }
     } catch (Exception $e) {
         $last_message_id = 0;
     }
@@ -371,9 +402,9 @@ add_shortcode('sso_order_view', function () {
     ?>
 
 <script>
-window.ssoOrderId = <?= (int) $id ?>;
+window.ssoOrderId = <?php echo (int) $id; ?>;
 window.ssoLastMessageId =
-    <?= (int) $last_message_id ?>;
+    <?php echo (int) $last_message_id; ?>;
 </script>
 
     <div class="sso-order" id="sso-order">
