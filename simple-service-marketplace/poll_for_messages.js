@@ -1,3 +1,4 @@
+const newMessageClass = "sso-new-message";
 
 async function pollChat() {
 
@@ -32,7 +33,7 @@ async function pollChat() {
                     msg.id;
 
                 el.innerHTML = `
-                    <div>
+                    <div class"${newMessageClass}">
                         <strong>
                             ${escapeHtml(msg.sender)}
                         </strong>
@@ -46,6 +47,12 @@ async function pollChat() {
                         ${escapeHtml(msg.message)}
                     </div>
                 `;
+
+               el.className = newMessageClass;
+
+                setTimeout(() => {
+                    el.classList.remove(newMessageClass);
+                }, 2500);
 
                 container.prepend(el);
 
@@ -84,6 +91,19 @@ function escapeHtml(text) {
     div.textContent = text;
 
     return div.innerHTML;
+}
+
+function addMessage(text) {
+  const msg = document.createElement("div");
+  msg.className = "message is-new";
+  msg.textContent = text;
+
+  document.querySelector("#chat").appendChild(msg);
+
+  // Remove highlight state after animation
+  setTimeout(() => {
+    msg.classList.remove(newMessageClass);
+  }, 2000);
 }
 
 pollChat();
