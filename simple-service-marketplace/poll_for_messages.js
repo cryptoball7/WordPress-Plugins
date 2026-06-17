@@ -1,5 +1,7 @@
 const newMessageClass = "sso-new-message";
 
+const audio = new Audio('pluck.wav'); // TODO: localize this
+
 async function pollChat() {
 
     try {
@@ -55,6 +57,8 @@ async function pollChat() {
                 }, 2500);
 
                 container.prepend(el);
+
+                audio.play();
 
                 window.ssoLastMessageId =
                     Math.max(

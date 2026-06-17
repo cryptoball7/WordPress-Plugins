@@ -1,3 +1,7 @@
+9:27 PM 6/16/2026
+
+Localize the reference to pluck.wav in poll_for_messages.js
+
 4:12 PM 6/14/2026
 
 Make new messages stay highlighted until visible
