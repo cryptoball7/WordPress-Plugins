@@ -1,6 +1,6 @@
-9:27 PM 6/16/2026
+5:51 PM 6/17/2026
 
-Localize the reference to pluck.wav in poll_for_messages.js
+Silence pluck.wav when receiving your own messages through polling (or maybe handle them differently)
 
 4:12 PM 6/14/2026
 
@@ -9,10 +9,6 @@ Make new messages stay highlighted until visible
 9:50 PM 6/13/2026
 
 Add link to profile or email/ contact page to sender name in message header
-
-9:49 PM 6/13/2026
-
-Add animation and sound when new messages arrive
 
 12:10 AM 5/21/2026
 

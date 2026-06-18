@@ -238,6 +238,17 @@ function sso_chat_updates() {
             '1.0',
             true
         );
+
+$sound_url = plugins_url( 'pluck.wav', __FILE__ );
+
+wp_localize_script( 
+        'sso-chat-live', 
+        'assetUrls', 
+        array(
+            'notificationSound' => $sound_url
+        )
+    );
+
     }
 
 

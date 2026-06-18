@@ -1,4 +1,20 @@
 DONE
+5:53 PM 6/17/2026
+
+ADDED
+9:49 PM 6/13/2026
+
+Add animation and sound when new messages arrive
+
+DONE
+5:52 PM 6/17/2026
+
+ADDED
+9:27 PM 6/16/2026
+
+Localize the reference to pluck.wav in poll_for_messages.js
+
+DONE
 2:09 PM 6/13/2026
 
 Looks like it already does because polling is handled by shortcode 'sso_order_view' which checks for the key before doing almost everything else
