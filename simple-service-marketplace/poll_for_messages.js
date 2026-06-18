@@ -1,6 +1,6 @@
 const newMessageClass = "sso-new-message";
 
-const audio = new Audio(assetUrls.notificationSound); // TODO: localize this
+const audio = new Audio(assetUrls.notificationSound);
 
 async function pollChat() {
 
