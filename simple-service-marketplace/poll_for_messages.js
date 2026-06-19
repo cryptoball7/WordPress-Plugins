@@ -58,7 +58,9 @@ async function pollChat() {
 
                 container.prepend(el);
 
-                audio.play();
+                if(msg.sender != message.senderName) {
+                    audio.play();
+                }
 
                 window.ssoLastMessageId =
                     Math.max(

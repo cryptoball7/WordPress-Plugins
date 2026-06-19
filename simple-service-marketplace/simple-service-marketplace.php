@@ -138,61 +138,62 @@ class SSO_Plugin
         }
 
         // Message Update Handler //
-add_action(
-    'wp_ajax_sso_chat_updates',
-    'sso_chat_updates'
-);
+        add_action(
+            'wp_ajax_sso_chat_updates',
+            'sso_chat_updates'
+        );
 
-add_action(
-    'wp_ajax_nopriv_sso_chat_updates',
-    'sso_chat_updates'
-);
+        add_action(
+            'wp_ajax_nopriv_sso_chat_updates',
+            'sso_chat_updates'
+        );
 
-function sso_chat_updates() {
+        function sso_chat_updates()
+        {
 
-    $order_id = (int)
-        ($_GET['order_id'] ?? 0);
+            $order_id = (int) 
+                ($_GET['order_id'] ?? 0);
 
-    $after = (int)
-        ($_GET['after'] ?? 0);
+            $after = (int) 
+                ($_GET['after'] ?? 0);
 
-    $messages = get_posts([
-        'post_type'      => 'sso_message',
-        'posts_per_page' => -1,
-        'orderby'        => 'ID',
-        'order'          => 'ASC',
-        'post__not_in'   => range(1, $after),
+            $messages = get_posts([
+                'post_type' => 'sso_message',
+                'posts_per_page' => -1,
+                'orderby' => 'ID',
+                'order' => 'ASC',
+                'post__not_in' => range(1, $after),
 
-        'meta_query' => [
-            [
-                'key'   => 'order_id',
-                'value' => $order_id
-            ]
-        ]
-    ]);
+                'meta_query' => [
+                    [
+                        'key' => 'order_id',
+                        'value' => $order_id
+                    ]
+                ]
+            ]);
 
-    $output = [];
+            $output = [];
 
-    foreach ($messages as $msg) {
+            foreach ($messages as $msg) {
 
-        if ($msg->ID <= $after) {
-            continue;
+                if ($msg->ID <= $after) {
+                    continue;
+                }
+
+                $output[] = [
+                    'id' => $msg->ID,
+                    'sender' => get_post_meta(
+                        $msg->ID,
+                        'sender',
+                        true
+                    ),
+                    'date' => $msg->post_date,
+                    'message' => $msg->post_content
+                ];
+            }
+
+            wp_send_json($output);
         }
-
-        $output[] = [
-            'id'      => $msg->ID,
-            'sender'  => get_post_meta(
-                $msg->ID,
-                'sender',
-                true
-            ),
-            'date'    => $msg->post_date,
-            'message' => $msg->post_content
-        ];
-    }
-
-    wp_send_json($output);
-}
 
     }
 
@@ -220,64 +221,109 @@ function sso_chat_updates() {
         ]);
 
 
-    global $post;
+        global $post;
 
-    if (
-        is_a($post, 'WP_Post') &&
-        has_shortcode(
-            $post->post_content,
-            'sso_order_view'
-        )
-    ) {
+        if (
+            is_a($post, 'WP_Post') &&
+            has_shortcode(
+                $post->post_content,
+                'sso_order_view'
+            )
+        ) {
 
-        wp_enqueue_script(
-            'sso-chat-live',
-            plugin_dir_url(__FILE__) .
-            'poll_for_messages.js',
-            [],
-            '1.0',
-            true
-        );
+            wp_enqueue_script(
+                'sso-chat-live',
+                plugin_dir_url(__FILE__) .
+                'poll_for_messages.js',
+                [],
+                '1.0',
+                true
+            );
 
-$sound_url = plugins_url( 'pluck.wav', __FILE__ );
+            $sound_url = plugins_url('pluck.wav', __FILE__);
 
-wp_localize_script( 
-        'sso-chat-live', 
-        'assetUrls', 
-        array(
-            'notificationSound' => $sound_url
-        )
-    );
+            wp_localize_script(
+                'sso-chat-live',
+                'assetUrls',
+                array(
+                    'notificationSound' => $sound_url
+                )
+            );
+
+            wp_localize_script(
+                'sso-chat-live',
+                'message',
+                array(
+                    'senderName' => get_current_user_display_name()
+                )
+            );
+
+        }
+
 
     }
 
+    public $current_user = false;
 
-    }
-
-    public function order_form_shortcode($atts)
+    public function get_current_user()
     {
-        if ( is_user_logged_in() ) {
-            $current_user = wp_get_current_user();
+        if($this->current_user)
+        {
+            return $this->current_user;
+        }
+        
+        if (is_user_logged_in())
+        {
+            $this->current_user = wp_get_current_user();
+            return $this->current_user;
+        }
+        
+        return $this->current_user;
+    }
+
+    public function get_current_user_display_name()
+    {
+        $current_user = get_current_user();
+
+        if ($current_user) {
 
             $name = $current_user->display_name;
 
             if ("" == $name) {
                 $name = $current_user->user_login;
             }
-
-            $email = $current_user->user_email;
         } else {
             $name = "";
+        }
+
+        return $name;
+    }
+
+    public function get_current_user_email_address()
+    {
+        $current_user = get_current_user();
+
+        if ($current_user) {
+            $email = $current_user->user_email;
+        } else {
             $email = "";
         }
 
-        if("" != $name) {
+        return $email;
+    }
+
+    public function order_form_shortcode($atts)
+    {
+        $name = get_current_user_display_name();
+        $email = get_current_user_email_address();
+
+        if ("" != $name) {
             $name_disabled = "disabled";
         } else {
             $name_disabled = "";
         }
 
-        if("" != $email) {
+        if ("" != $email) {
             $email_disabled = "disabled";
         } else {
             $email_disabled = "";
@@ -399,7 +445,7 @@ add_shortcode('sso_order_view', function () {
     ]);
 
     try {
-        if(array_key_exists(0, $messages) && property_exists($messages[0], "ID")) {
+        if (array_key_exists(0, $messages) && property_exists($messages[0], "ID")) {
             $last_message_id = $messages[0]->ID;
         } else {
             $last_message_id = 0;
@@ -412,11 +458,11 @@ add_shortcode('sso_order_view', function () {
 
     ?>
 
-<script>
-window.ssoOrderId = <?php echo (int) $id; ?>;
-window.ssoLastMessageId =
-    <?php echo (int) $last_message_id; ?>;
-</script>
+    <script>
+        window.ssoOrderId = <?php echo (int) $id; ?>;
+        window.ssoLastMessageId =
+            <?php echo (int) $last_message_id; ?>;
+    </script>
 
     <div class="sso-order" id="sso-order">
 
@@ -439,20 +485,20 @@ window.ssoLastMessageId =
         <h3>Messages</h3>
 
         <div id="sso-chat-messages">
-        <?php
+            <?php
 
-        foreach ($messages as $msg) {
-            echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
-            echo '<div class="sso-date">' . $msg->post_date . '</div>';
-            echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
-        }
+            foreach ($messages as $msg) {
+                echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
+                echo '<div class="sso-date">' . $msg->post_date . '</div>';
+                echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
+            }
 
-        ?>
+            ?>
         </div>
     </div>
-        <?php
+    <?php
 
-        return ob_get_clean();
+    return ob_get_clean();
 });
 
 add_action('wp_ajax_sso_send_message', 'sso_send_message');
