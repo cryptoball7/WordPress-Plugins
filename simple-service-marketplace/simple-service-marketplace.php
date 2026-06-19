@@ -254,7 +254,7 @@ class SSO_Plugin
                 'sso-chat-live',
                 'message',
                 array(
-                    'senderName' => get_current_user_display_name()
+                    'senderName' => $this->get_current_user_display_name()
                 )
             );
 
@@ -283,7 +283,7 @@ class SSO_Plugin
 
     public function get_current_user_display_name()
     {
-        $current_user = get_current_user();
+        $current_user = $this->get_current_user();
 
         if ($current_user) {
 
@@ -301,7 +301,7 @@ class SSO_Plugin
 
     public function get_current_user_email_address()
     {
-        $current_user = get_current_user();
+        $current_user = $this->get_current_user();
 
         if ($current_user) {
             $email = $current_user->user_email;
@@ -314,8 +314,8 @@ class SSO_Plugin
 
     public function order_form_shortcode($atts)
     {
-        $name = get_current_user_display_name();
-        $email = get_current_user_email_address();
+        $name = $this->get_current_user_display_name();
+        $email = $this->get_current_user_email_address();
 
         if ("" != $name) {
             $name_disabled = "disabled";
