@@ -250,11 +250,19 @@ class SSO_Plugin
                 )
             );
 
+            $senderName = $this->get_current_user_display_name();
+
+            if("" == $senderName)
+            {
+              $id = intval($_GET['id']);
+              $senderName = get_post_meta($id, 'name', true);
+            }
+
             wp_localize_script(
                 'sso-chat-live',
                 'message',
                 array(
-                    'senderName' => $this->get_current_user_display_name()
+                    'senderName' => $senderName
                 )
             );
 
