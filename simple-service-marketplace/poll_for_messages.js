@@ -58,6 +58,8 @@ async function pollChat() {
 
                 container.prepend(el);
 
+                console.log([msg.sender, message.senderName]);
+
                 if(msg.sender != message.senderName) {
                     audio.play();
                 }
