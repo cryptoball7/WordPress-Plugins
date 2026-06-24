@@ -1,7 +1,3 @@
-5:51 PM 6/17/2026
-
-Silence pluck.wav when receiving your own messages through polling (or maybe handle them differently)
-
 4:12 PM 6/14/2026
 
 Make new messages stay highlighted until visible
