@@ -52,9 +52,22 @@ async function pollChat() {
 
                el.className = newMessageClass;
 
-                setTimeout(() => {
+                /* setTimeout(() => {
                     el.classList.remove(newMessageClass);
-                }, 2500);
+                }, 2500); */
+
+el.addEventListener("animationend", function handler(e) {
+    if (e.animationName !== "newMessageFade") return;
+
+    el.classList.remove(newMessageClass);
+    el.removeEventListener("animationend", handler);
+});
+
+const observer = new IntersectionObserver(([entry]) => {
+  entry.target.classList.toggle("visible", entry.isIntersecting);
+});
+
+observer.observe(el);
 
                 container.prepend(el);
 

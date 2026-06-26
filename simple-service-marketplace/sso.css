@@ -1,5 +1,10 @@
 .sso-new-message {
   animation: newMessageFade 2.5s ease forwards;
+  animation-play-state: paused;
+}
+
+.sso-new-message.visible {
+  animation-play-state: running;
 }
 
 @keyframes newMessageFade {
