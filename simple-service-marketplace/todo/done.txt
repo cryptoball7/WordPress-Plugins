@@ -1,4 +1,17 @@
 DONE
+10:46 PM 6/28/2026
+
+ADDED
+4:20 PM 6/26/2026
+
+Test staying highlighted
+
+ADDED
+4:12 PM 6/14/2026
+
+Make new messages stay highlighted until visible
+
+DONE
 5:22 PM 6/23/2026
 
 ADDED

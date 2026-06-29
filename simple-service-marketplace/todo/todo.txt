@@ -1,11 +1,3 @@
-4:20 PM 6/26/2026
-
-Test staying highlighted
-
-4:12 PM 6/14/2026
-
-Make new messages stay highlighted until visible
-
 9:50 PM 6/13/2026
 
 Add link to profile or email/ contact page to sender name in message header
