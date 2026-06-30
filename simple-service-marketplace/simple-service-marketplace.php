@@ -475,6 +475,7 @@ add_shortcode('sso_order_view', function () {
     <div class="sso-order" id="sso-order">
 
         <h2>Order Details</h2>
+        <p>From: <a href="mailto:<?php echo esc_html(get_post_meta($id, 'email', true)); ?>"><strong><?php echo esc_html(get_post_meta($id, 'name', true)); ?></strong></a></p>
         <p><?php echo esc_html(get_post_meta($id, 'requirements', true)); ?></p>
 
         <h3>Send Message</h3>
