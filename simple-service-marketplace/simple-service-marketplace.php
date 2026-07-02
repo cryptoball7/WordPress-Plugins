@@ -384,6 +384,8 @@ class SSO_Plugin
         update_post_meta($order_id, 'email', $email);
         update_post_meta($order_id, 'requirements', $requirements);
 
+update_post_meta($order_id, 'user_id', get_current_user_id());
+
         if (!empty($_FILES['file']['name'])) {
             require_once(ABSPATH . 'wp-admin/includes/file.php');
             $uploaded = media_handle_upload('file', $order_id);
@@ -475,7 +477,7 @@ add_shortcode('sso_order_view', function () {
     <div class="sso-order" id="sso-order">
 
         <h2>Order Details</h2>
-        <p>From: ><strong><?php echo esc_html(get_post_meta($id, 'name', true)); ?> &lt;<a href="mailto:<?php echo esc_html(get_post_meta($id, 'email', true)); ?>"<?php echo esc_html(get_post_meta($id, 'email', true)); ?></a>&gt;</strong></p>
+        <p>From: <strong><?php echo esc_html(get_post_meta($id, 'name', true)); ?> &lt;<a href="mailto:<?php echo esc_html(get_post_meta($id, 'email', true)); ?>"><?php echo esc_html(get_post_meta($id, 'email', true)); ?></a>&gt;</strong></p>
         <p><?php echo esc_html(get_post_meta($id, 'requirements', true)); ?></p>
 
         <h3>Send Message</h3>
@@ -526,6 +528,8 @@ function sso_send_message()
 
     update_post_meta($msg_id, 'order_id', $order_id);
     update_post_meta($msg_id, 'sender', 'client');
+
+    update_post_meta($msg_id, 'user_id', get_current_user_id());
 
     wp_send_json_success();
 }
