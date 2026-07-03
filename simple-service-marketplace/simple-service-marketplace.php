@@ -435,6 +435,12 @@ add_shortcode('sso_order_view', function () {
         }
     }
 
+    $email = $current_user->user_email;
+
+    if ("" == $email) {
+        $email = get_post_meta($id, 'email', true);
+    }
+
     if (isset($_POST['send_msg'])) {
         $msg = sanitize_textarea_field($_POST['message']);
         $msg_id = wp_insert_post([
@@ -445,6 +451,8 @@ add_shortcode('sso_order_view', function () {
         update_post_meta($msg_id, 'order_id', $id);
         update_post_meta($msg_id, 'sender', $name); // or 'admin'
         update_post_meta($msg_id, 'type', 'message'); // message | status | system
+        update_post_meta($msg_id, 'email', $email);
+        update_post_meta($msg_id, 'user_id', $current_user->ID);
         echo '<p>Message sent</p>';
     }
 
@@ -499,7 +507,7 @@ add_shortcode('sso_order_view', function () {
             <?php
 
             foreach ($messages as $msg) {
-                echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . '</strong></div>';
+                echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . ' &lt;' . esc_html(get_post_meta($msg->ID, 'email', true)) . '&gt;</strong></div>';
                 echo '<div class="sso-date">' . $msg->post_date . '</div>';
                 echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
             }
