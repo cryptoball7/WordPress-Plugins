@@ -1,4 +1,24 @@
 DONE
+3:43 PM 7/3/2026
+
+Decided not to for now
+
+Maybe will add "client page" or "seller page" in the future (maybe with a contact form), but for now showing email seems to go against user privacy expectations
+
+ADDED
+5:29 PM 7/2/2026
+
+Decide whether to display email in message header
+
+CLOSED
+3:43 PM 7/3/2026
+
+ADDED
+9:50 PM 6/13/2026
+
+Add link to profile or email/ contact page to sender name in message header
+
+DONE
 10:46 PM 6/28/2026
 
 ADDED

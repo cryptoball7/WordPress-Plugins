@@ -1,11 +1,3 @@
-5:29 PM 7/2/2026
-
-Decide whether to display email in message header
-
-9:50 PM 6/13/2026
-
-Add link to profile or email/ contact page to sender name in message header
-
 12:10 AM 5/21/2026
 
 Add option for email notifications for orders and messages

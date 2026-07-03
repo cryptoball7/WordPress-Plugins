@@ -507,7 +507,7 @@ add_shortcode('sso_order_view', function () {
             <?php
 
             foreach ($messages as $msg) {
-                echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . ' &lt;' . esc_html(get_post_meta($msg->ID, 'email', true)) . '&gt;</strong></div>';
+                echo '<div><strong>' . esc_html(get_post_meta($msg->ID, 'sender', true)) . ' </strong></div>';
                 echo '<div class="sso-date">' . $msg->post_date . '</div>';
                 echo '<div class="sso-message-body">' . esc_html($msg->post_content) . '</div>';
             }
