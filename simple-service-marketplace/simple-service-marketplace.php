@@ -488,6 +488,8 @@ add_shortcode('sso_order_view', function () {
         <p>From: <strong><?php echo esc_html(get_post_meta($id, 'name', true)); ?> &lt;<a href="mailto:<?php echo esc_html(get_post_meta($id, 'email', true)); ?>"><?php echo esc_html(get_post_meta($id, 'email', true)); ?></a>&gt;</strong></p>
         <p><?php echo esc_html(get_post_meta($id, 'requirements', true)); ?></p>
 
+        <input type="checkbox"> Receive email updates
+
         <h3>Send Message</h3>
 
         <form method="post" class="sso-form" id="sso-message-form">
