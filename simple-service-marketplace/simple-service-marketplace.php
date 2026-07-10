@@ -19,6 +19,8 @@ class SSO_Plugin
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_action('wp_ajax_sso_submit_order', [$this, 'handle_order']);
         add_action('wp_ajax_nopriv_sso_submit_order', [$this, 'handle_order']);
+        add_action('wp_ajax_sso_subscribe_email', [$this, 'subscribe_email']);
+        add_action('wp_ajax_nopriv_sso_subscribe_email', [$this, 'subscribe_email']);
 
         add_action('init', function () {
             wp_register_script(
@@ -400,6 +402,11 @@ update_post_meta($order_id, 'user_id', get_current_user_id());
         update_post_meta($order_id, 'link', $link);
 
         wp_send_json_success(['link' => $link]);
+    }
+
+    public function subscribe_email() {
+        // TODO: Check if user is logged in or has a secret key
+        // TODO: Update meta
     }
 }
 
