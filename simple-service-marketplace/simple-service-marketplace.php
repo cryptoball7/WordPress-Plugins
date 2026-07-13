@@ -406,6 +406,12 @@ update_post_meta($order_id, 'user_id', get_current_user_id());
 
     public function subscribe_email() {
         // TODO: Check if user is logged in or has a secret key
+
+        $id = intval($_POST['id']);
+        $key = sanitize_text_field($_POST['key']);
+
+        $saved_key = get_post_meta($id, 'secret', true);
+
         // TODO: Update meta
     }
 }
