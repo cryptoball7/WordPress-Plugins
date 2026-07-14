@@ -412,6 +412,10 @@ update_post_meta($order_id, 'user_id', get_current_user_id());
 
         $saved_key = get_post_meta($id, 'secret', true);
 
+        if(!$this->get_current_user() && $key != $saved_key) {
+          // TODO: Status not authorized and return
+        }
+
         // TODO: Update meta
     }
 }
